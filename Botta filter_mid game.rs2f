@@ -1,0 +1,5146 @@
+/*@ define:module:header
+hidden: true
+name: header
+*/
+meta { name = "GMH Filter"; }
+
+/*@ define:module:default_styling
+---
+name: Default Styling
+subtitle: The first layer of styling items
+description: |
+  This contains the default styles and options to configure style programmatically.
+  
+  *Note: These styles can be overridden by modules below.*
+*/
+
+/*@ define:input:default_styling
+type: style
+label: Default Style
+group: Default Style
+exampleItem: Santa hat
+exampleItemId: 1050
+*/
+#define VAR_GLOBAL_CUSTOMSTYLE fontType = 3;showLootbeam = false;showDespawn = false;
+
+apply (true) {
+    VAR_GLOBAL_CUSTOMSTYLE 
+}
+
+/*@ define:input:default_styling
+type: style
+label: "Default Stackable/Noted Style"
+group: "Default Stackable/Noted Style"
+exampleItem: Magic shortbow (u)
+exampleItemId: 73
+*/
+#define VAR_DEFAULT_STACKABLE_NOTED_CUSTOMSTYLE fontType = 3;hideOverlay = false;
+
+apply (stackable:true || noted:true) {
+    VAR_DEFAULT_STACKABLE_NOTED_CUSTOMSTYLE 
+}
+
+/*@ define:input:default_styling
+type: style
+label: Default Untradeable Style
+group: Default Untradeable Style
+exampleItem: Long bone
+exampleItemId: 10976
+*/
+#define VAR_DEFAULT_UNTRADEABLE_CUSTOMSTYLE fontType = 3;icon = CurrentItem();
+
+apply (tradeable:false) {
+    VAR_DEFAULT_UNTRADEABLE_CUSTOMSTYLE 
+}
+
+/*@ define:input:default_styling
+type: boolean
+label: Show Value for Tradeable Items
+*/
+#define VAR_GLOBAL_SHOW_TRADEABLE_VALUE false
+
+apply ((tradeable:true || name:CONST_GLOBAL_TRADEABLE_NON_TRADEABLE_ITEMS) && VAR_GLOBAL_SHOW_TRADEABLE_VALUE) {
+    showValue = true;
+}
+
+/*@ define:input:default_styling
+type: boolean
+label: Show Value for Untradeable Items
+*/
+#define VAR_GLOBAL_SHOW_UNTRADEABLE_VALUE false
+
+apply (tradeable:false && VAR_GLOBAL_SHOW_UNTRADEABLE_VALUE) {
+    showValue = true;
+}
+
+/*@ define:input:default_styling
+type: number
+label: Hide despawn timer for items below this value
+group: Value-Based Style Settings
+*/
+#define VAR_GLOBAL_DESPAWN_TIMER_MINIMUM_VALUE 0
+
+apply ((tradeable:true || name:CONST_GLOBAL_TRADEABLE_NON_TRADEABLE_ITEMS) && value:<VAR_GLOBAL_DESPAWN_TIMER_MINIMUM_VALUE) {
+    showDespawn = false;
+}
+
+/*@ define:input:default_styling
+type: number
+label: Hide prices for items below this value
+group: Value-Based Style Settings
+*/
+#define VAR_GLOBAL_SHOW_PRICES_MINIMUM_VALUE 0
+
+apply ((tradeable:true || name:CONST_GLOBAL_TRADEABLE_NON_TRADEABLE_ITEMS) && value:<VAR_GLOBAL_SHOW_PRICES_MINIMUM_VALUE) {
+    showValue = false;
+}
+
+/*@ define:input:default_styling
+type: number
+label: Hide icons for items below this value
+group: Value-Based Style Settings
+*/
+#define VAR_GLOBAL_ICON_MINIMUM_VALUE 0
+
+apply ((tradeable:true || name:CONST_GLOBAL_TRADEABLE_NON_TRADEABLE_ITEMS) && value:<VAR_GLOBAL_ICON_MINIMUM_VALUE) {
+    // this is a hack to turn off the icon
+    icon = Sprite(9000000, 0);
+}
+
+/*@ define:input:default_styling
+type: stringlist
+label: Items to show icons for (if not showing for all items)
+*/
+#define VAR_GLOBAL_SHOW_ICONS_ITEMLIST ["Vorkath's head","Scaly blue dragonhide"]
+
+apply (name:VAR_GLOBAL_SHOW_ICONS_ITEMLIST) {
+    icon = CurrentItem();
+}
+
+/*@ define:module:sorting
+---
+name: Sorting
+subtitle: Picking up the good stuff first
+description: |
+  This allows you to order the pickup menu in a few different ways.
+
+  NOTE: This requires that "Price Sort" in the "Custom Menu Swaps" plugin under "Ground Item Sort" to be DISABLED.
+*/
+
+/*@ define:input:sorting
+type: boolean
+label: Sort by value
+group: Menu Sorting
+*/
+#define VAR_SORTING_MENU_SORT_BY_VALUE false
+
+/*@ define:input:sorting
+type: boolean
+label: Prioritize Stackable/noted
+group: Menu Sorting
+*/
+#define VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST false
+
+/*@ define:input:sorting
+type: boolean
+label: Prioritize Untradeables
+group: Menu Sorting
+*/
+#define VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST false
+
+/*@ define:input:sorting
+type: stringlist
+label: Items to always show first
+group: Menu Sorting
+*/
+#define VAR_MENU_SORT_ITEMS_FIRST ["Coins"]
+
+/*@ define:module:filtering
+---
+name: Filtering
+subtitle: Sifting through the junk
+description: |
+  Individual Item Filtering
+  ---
+  Showing and hiding individual items.
+
+  Value-Based Filtering
+  ---
+  Hides tradeable items below a certain value. This is useful for filtering out items that are not worth picking up.
+  
+  *Note: Exceptions can be made to this in following modules.*
+
+  Ownership Filtering
+  ---
+  This has options to hide items based on their ownership.
+
+  *Plugin Settings Change Required: Please disable "Ownership filter" and "Item spawn filter" in the "General" settings section of "Loot Filters" in the Runelite sidebar.*
+
+  *Note: These are FINAL and any exceptions must be made in the "Exceptions to ownership filtering" list.*
+*/
+
+/* --- Individual Item Filtering --- */
+
+/*@ define:input:filtering
+type: stringlist
+label: Items to hide
+group: Individual Item Filtering
+*/
+#define VAR_GLOBAL_HIDE []
+
+apply (name:VAR_GLOBAL_HIDE) {
+    hidden = true;
+}
+
+/*@ define:input:filtering
+type: stringlist
+label: Items to show
+group: Individual Item Filtering
+*/
+#define VAR_GLOBAL_SHOW ["Araxyte venom sack","Vorkath's head","Scaly blue dragonhide","Frozen tear","Air rune","Water rune","Earth rune","Dust rune","Mud rune","Fire rune","Smoke rune","Steam rune","Lava rune","Cosmic rune","Sunfire rune","Chaos rune","Astral rune","Nature rune","Law rune","Death rune","Blood rune","Soul rune","Wrath rune"]
+
+apply (name:VAR_GLOBAL_SHOW) {
+    hidden = false;
+}
+
+/* --- Value-Based Filtering --- */
+
+/*@ define:input:filtering
+type: number
+label: Hide items below this value
+group: Value-Based Filtering
+*/
+#define VAR_GLOBAL_MINIMUM_VALUE 2500
+
+apply ((tradeable:true || name:CONST_GLOBAL_TRADEABLE_NON_TRADEABLE_ITEMS) && value:<VAR_GLOBAL_MINIMUM_VALUE) {
+    hidden = true;
+}
+
+/*@ define:input:filtering
+type: number
+label: Hide stackable items below this value
+group: Value-Based Filtering
+*/
+#define VAR_GLOBAL_STACKABLE_MINIMUM_VALUE 0
+
+apply ((tradeable:true || name:CONST_GLOBAL_TRADEABLE_NON_TRADEABLE_ITEMS) && (stackable:true || noted:true) && value:<VAR_GLOBAL_STACKABLE_MINIMUM_VALUE) {
+    hidden = true;
+}
+
+/*@ define:input:filtering
+type: number
+label: Hide non-stackable items below this value
+group: Value-Based Filtering
+*/
+#define VAR_GLOBAL_NON_STACKABLE_MINIMUM_VALUE 0
+
+apply ((tradeable:true || name:CONST_GLOBAL_TRADEABLE_NON_TRADEABLE_ITEMS) && stackable:false && noted:false && value:<VAR_GLOBAL_NON_STACKABLE_MINIMUM_VALUE) {
+    hidden = true;
+}
+
+/* --- Ownership Filtering --- */
+
+/*@ define:input:filtering
+type: boolean
+label: Hide others' drops
+group: Ownership Filtering
+*/
+#define VAR_GLOBAL_HIDE_OTHER_PLAYERS_ITEMS false
+
+/*@ define:input:filtering
+type: boolean
+label: Hide world spawns
+group: Ownership Filtering
+*/
+#define VAR_GLOBAL_HIDE_SPAWN_ITEMS true
+
+/*@ define:input:filtering
+type: stringlist
+label: Exceptions to ownership filtering
+group: Ownership Filtering
+*/
+#define VAR_OWNERSHIP_FILTERING_EXCEPTIONS ["Water container","Dawnbringer","Elder*","Twisted*","Kodai*","Revitalisation*","Prayer enhance*","Xeric's aid*","Antipoison*","Overload*","Golpar seed","Buchu seed","Noxifer seed","Endarkened juice","Stinkhorn mushroom","Cicely","Mallignum root plank"]
+
+rule (ownership:OWNERSHIP_NONE && VAR_GLOBAL_HIDE_SPAWN_ITEMS  && !name:VAR_OWNERSHIP_FILTERING_EXCEPTIONS) {
+    hidden = true;
+}
+
+rule (ownership:OWNERSHIP_OTHER && VAR_GLOBAL_HIDE_OTHER_PLAYERS_ITEMS && !name:VAR_OWNERSHIP_FILTERING_EXCEPTIONS) {
+    hidden = true;
+}
+
+/*@ define:module:item_tiers
+---
+name: Item tiers
+subtitle: Pick out the good stuff
+description: |
+  This highlights items based on their values. By default tiers are 20k, 100k, 1m, and 10m, with loot beams appearing starting at 1m.
+*/
+
+/*@ define:input:item_tiers
+type: number
+label: Minimum value
+group: Tier 1
+*/
+#define VAR_VALUES_TIER_1_VALUE 15001
+
+/*@ define:input:item_tiers
+type: stringlist
+label: Tier 1 force items shown
+group: Tier 1
+*/
+#define VAR_VALUES_TIER_1_SHOW []
+
+/*@ define:input:item_tiers
+type: style
+label: Tier 1 custom style
+group: Tier 1
+exampleItem: Helm of neitiznot
+exampleItemId: 10828
+*/
+#define VAR_VALUES_TIER_1_CUSTOMSTYLE textColor = "#ff01e01e";textAccentColor = "#FF000000";lootbeamColor = "#ff01e01e";menuTextColor = "#ff01e01e";textAccent = 1;fontType = 3;showLootbeam = false;highlightTile = false;
+
+apply ((value:>=VAR_VALUES_TIER_1_VALUE && value:<VAR_VALUES_TIER_2_VALUE) || name:VAR_VALUES_TIER_1_SHOW) {
+    VAR_VALUES_TIER_1_CUSTOMSTYLE 
+}
+
+/*@ define:input:item_tiers
+type: number
+label: Minimum value
+group: Tier 2
+*/
+#define VAR_VALUES_TIER_2_VALUE 100001
+
+/*@ define:input:item_tiers
+type: stringlist
+label: Tier 2 force items shown
+group: Tier 2
+*/
+#define VAR_VALUES_TIER_2_SHOW []
+
+/*@ define:input:item_tiers
+type: style
+label: Tier 2 custom style
+group: Tier 2
+exampleItem: Infinity boots
+exampleItemId: 6920
+*/
+#define VAR_VALUES_TIER_2_CUSTOMSTYLE textColor = "#ff007dff";textAccentColor = "#FF000000";lootbeamColor = "#ff007bff";menuTextColor = "#ff007dff";fontType = 3;showLootbeam = true;hideOverlay = false;
+
+apply ((value:>=VAR_VALUES_TIER_2_VALUE && value:<VAR_VALUES_TIER_3_VALUE) || name:VAR_VALUES_TIER_2_SHOW) {
+    VAR_VALUES_TIER_2_CUSTOMSTYLE 
+}
+
+/*@ define:input:item_tiers
+type: number
+label: Minimum value
+group: Tier 3
+*/
+#define VAR_VALUES_TIER_3_VALUE 500001
+
+/*@ define:input:item_tiers
+type: stringlist
+label: Tier 3 force items shown
+group: Tier 3
+*/
+#define VAR_VALUES_TIER_3_SHOW []
+
+/*@ define:input:item_tiers
+type: style
+label: Tier 3 custom style
+group: Tier 3
+exampleItem: Abyssal whip
+exampleItemId: 4151
+*/
+#define VAR_VALUES_TIER_3_CUSTOMSTYLE textColor = "#ffc356d0";backgroundColor = "#00ffffff";borderColor = "#00ff9500";textAccentColor = "#FF000000";lootbeamColor = "#ff38093d";menuTextColor = "#ff80058e";fontType = 3;showLootbeam = true;icon = CurrentItem();
+
+apply ((value:>=VAR_VALUES_TIER_3_VALUE && value:<VAR_VALUES_TIER_4_VALUE) || name:VAR_VALUES_TIER_3_SHOW) {
+    VAR_VALUES_TIER_3_CUSTOMSTYLE 
+}
+
+/*@ define:input:item_tiers
+type: number
+label: Minimum value
+group: Tier 4
+*/
+#define VAR_VALUES_TIER_4_VALUE 2000001
+
+/*@ define:input:item_tiers
+type: stringlist
+label: Tier 4 force items shown
+group: Tier 4
+*/
+#define VAR_VALUES_TIER_4_SHOW []
+
+/*@ define:input:item_tiers
+type: style
+label: Tier 4 custom style
+group: Tier 4
+exampleItem: Twisted bow
+exampleItemId: 20997
+*/
+#define VAR_VALUES_TIER_4_CUSTOMSTYLE textColor = "#fff8e600";backgroundColor = "#00ffffff";borderColor = "#00ff66b3";textAccentColor = "#FF000000";lootbeamColor = "#fff7e700";menuTextColor = "#fff8e600";fontType = 3;showLootbeam = true;icon = CurrentItem();
+
+apply (value:>=VAR_VALUES_TIER_4_VALUE || name:VAR_VALUES_TIER_4_SHOW) {
+    VAR_VALUES_TIER_4_CUSTOMSTYLE 
+}
+
+/*@ define:input:item_tiers
+type: boolean
+label: Dont let tier 1 items get filtered out or restyled in future modules
+group: "Power User: Stop Filter Execution"
+*/
+#define VAR_VALUES_TIER_1_TERMINATE false
+
+/*@ define:input:item_tiers
+type: boolean
+label: Dont let tier 2 items get filtered out or restyled in future modules
+group: "Power User: Stop Filter Execution"
+*/
+#define VAR_VALUES_TIER_2_TERMINATE false
+
+/*@ define:input:item_tiers
+type: boolean
+label: Dont let tier 3 items get filtered out or restyled in future modules
+group: "Power User: Stop Filter Execution"
+*/
+#define VAR_VALUES_TIER_3_TERMINATE false
+
+/*@ define:input:item_tiers
+type: boolean
+label: Dont let tier 4 items get filtered out or restyled in future modules
+group: "Power User: Stop Filter Execution"
+*/
+#define VAR_VALUES_TIER_4_TERMINATE false
+
+rule (VAR_VALUES_TIER_1_TERMINATE && ((value:>=VAR_VALUES_TIER_1_VALUE && value:<VAR_VALUES_TIER_2_VALUE) || name:VAR_VALUES_TIER_1_SHOW)) {}
+rule (VAR_VALUES_TIER_2_TERMINATE && ((value:>=VAR_VALUES_TIER_2_VALUE && value:<VAR_VALUES_TIER_3_VALUE) || name:VAR_VALUES_TIER_2_SHOW)) {}
+rule (VAR_VALUES_TIER_3_TERMINATE && ((value:>=VAR_VALUES_TIER_3_VALUE && value:<VAR_VALUES_TIER_4_VALUE) || name:VAR_VALUES_TIER_3_SHOW)) {}
+rule (VAR_VALUES_TIER_4_TERMINATE && ((value:>=VAR_VALUES_TIER_4_VALUE) || name:VAR_VALUES_TIER_4_SHOW)) {}
+
+
+/*@ define:module:uniques
+---
+name: Uniques
+subtitle: Uniques are special! (even if they're not worth a lot)
+description: |
+  Add custom styling to unique items. By default this gives uniques on this list a loot beam and bold text. This can layer with other styling such as item tiers.
+*/
+
+/*@ define:input:uniques
+type: style
+label: Uniques custom style
+exampleItem: Tanzanite fang
+exampleItemId: 12922
+*/
+#define VAR_UNIQUES_CUSTOMSTYLE fontType = 3;showLootbeam = false;hideOverlay = false;icon = CurrentItem();
+
+/*@ define:input:uniques
+type: stringlist
+label: Uniques
+group: Uniques List
+*/
+#define VAR_UNIQUES_LIST ["Jar of dirt","Jar of swamp","Jar of sand","Jar of souls","Jar of miasma","Jar of darkness","Jar of stone","Jar of decay","Jar of chemicals","Jar of eyes","Jar of dreams","Jar of spirits","Jar of smoke","Jar of venom","Abyssal head","Araxyte head","Alchemical hydra heads","Godsword shard 1","Godsword shard 2","Godsword shard 3","Kbd heads","Kq head","Glacial temotli","Tanzanite mutagen","Magma mutagen","Parasitic egg","Magus vestige","Eye of the duke","Ice quartz","Venator vestige","Leviathan's lure","Smoke quartz","Bellator vestige","Siren's staff","Shadow quartz","Ultor vestige","Executioner's axe head","Dark claw","Twisted ancestral colour kit","Metamorphic dust","Holy ornament kit","Sanguine ornament kit","Sanguine dust","Big swordfish","Big shark","Big bass","Crawling hand","Cockatrice head","Basilisk head","Kurask head","Brimstone key","Dark totem top","Dark totem middle","Dark totem base","Araxyte venom sack","Araxyte venom sack (5)","Ancient shard","Coins","Bronze defender","Iron defender","Steel defender","Black defender","Mithril defender","Adamant defender","Rune defender","Dragon defender","Loop half of key","Tooth half of key","Frozen tear"]
+
+apply (name:VAR_UNIQUES_LIST) {
+    VAR_UNIQUES_CUSTOMSTYLE 
+}
+
+/*@ define:input:uniques
+type: boolean
+label: Dont let uniques get filtered out or restyled in future modules
+group: "Power User: Stop Filter Execution"
+*/
+#define VAR_UNIQUES_TERMINATE false
+
+rule (VAR_UNIQUES_TERMINATE && name:VAR_UNIQUES_LIST) {}
+
+
+/*@ define:module:clue_scrolls
+---
+name: Clue Scrolls
+subtitle: Can you do me one small favor?
+description: |
+  This module provides clue tier filters and custom styling for each clue tier.
+*/
+
+/*@ define:input:clue_scrolls
+type: enumlist
+label: Clue tiers to force hidden
+enum: [
+  {
+    "value": "Clue scroll (beginner)",
+    "label": "Beginner"
+  },
+  {
+    "value": "Clue scroll (easy)",
+    "label": "Easy"
+  },
+  {
+    "value": "Clue scroll (medium)",
+    "label": "Medium"
+  },
+  {
+    "value": "Clue scroll (hard)",
+    "label": "Hard"
+  },
+  {
+    "value": "Clue scroll (elite)",
+    "label": "Elite"
+  },
+  {
+    "value": "Clue scroll (master)",
+    "label": "Master"
+  }
+]
+*/
+#define VAR_CLUE_SCROLLS_HIDE ["Clue scroll (beginner)"]
+
+
+/*@ define:input:clue_scrolls
+type: style
+label: Beginner clue scroll custom style
+exampleItem: Clue scroll (beginner)
+*/
+#define VAR_CLUE_SCROLLS_BEGINNER_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#80908062";borderColor = "#FFCFC8C8";textAccentColor = "#FF000000";menuTextColor = "#FFCFC8C8";hideOverlay = true;
+
+/*@ define:input:clue_scrolls
+type: style
+label: Easy clue scroll custom style
+exampleItem: Clue scroll (easy)
+*/
+#define VAR_CLUE_SCROLLS_EASY_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#008f7f61";borderColor = "#00248f25";textAccentColor = "#ff01e01e";lootbeamColor = "#ffffffff";menuTextColor = "#ff01e01e";textAccent = 2;fontType = 3;showLootbeam = true;hideOverlay = false;icon = CurrentItem();
+
+/*@ define:input:clue_scrolls
+type: style
+label: Medium clue scroll custom style
+exampleItem: Clue scroll (medium)
+*/
+#define VAR_CLUE_SCROLLS_MEDIUM_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#008f7f61";borderColor = "#006dbbbf";textAccentColor = "#ff007dff";lootbeamColor = "#ffffffff";menuTextColor = "#ff007dff";textAccent = 2;fontType = 3;showLootbeam = true;icon = CurrentItem();
+
+/*@ define:input:clue_scrolls
+type: style
+label: Hard clue scroll custom style
+exampleItem: Clue scroll (hard)
+*/
+#define VAR_CLUE_SCROLLS_HARD_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#008f7f61";borderColor = "#00a242bd";textAccentColor = "#ffb72aef";lootbeamColor = "#ffffffff";menuTextColor = "#ffb72aef";textAccent = 2;fontType = 3;showLootbeam = true;icon = CurrentItem();
+
+/*@ define:input:clue_scrolls
+type: style
+label: Elite clue scroll custom style
+exampleItem: Clue scroll (elite)
+*/
+#define VAR_CLUE_SCROLLS_ELITE_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#008f7f61";borderColor = "#00d1be45";textAccentColor = "#ffaf8900";lootbeamColor = "#ffffffff";menuTextColor = "#fff7c100";textAccent = 2;fontType = 3;showLootbeam = true;icon = CurrentItem();
+
+/*@ define:input:clue_scrolls
+type: style
+label: Master clue scroll custom style
+exampleItem: Clue scroll (master)
+*/
+#define VAR_CLUE_SCROLLS_MASTER_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#008f7f61";borderColor = "#00c23d30";textAccentColor = "#ffff1500";lootbeamColor = "#ffffffff";menuTextColor = "#ffff1500";textAccent = 2;fontType = 3;showLootbeam = true;icon = CurrentItem();
+
+
+
+
+apply (name:VAR_CLUE_SCROLLS_HIDE) {
+    hidden = true;
+}
+
+apply (name:"Clue scroll (beginner)") {
+    VAR_CLUE_SCROLLS_BEGINNER_CUSTOMSTYLE 
+}
+apply (name:"Clue scroll (easy)") {
+    VAR_CLUE_SCROLLS_EASY_CUSTOMSTYLE 
+}
+apply (name:"Clue scroll (medium)") {
+    VAR_CLUE_SCROLLS_MEDIUM_CUSTOMSTYLE 
+}
+apply (name:"Clue scroll (hard)") {
+    VAR_CLUE_SCROLLS_HARD_CUSTOMSTYLE 
+}
+apply (name:"Clue scroll (elite)") {
+    VAR_CLUE_SCROLLS_ELITE_CUSTOMSTYLE 
+}
+apply (name:"Clue scroll (master)") {
+    VAR_CLUE_SCROLLS_MASTER_CUSTOMSTYLE 
+}
+
+
+
+
+
+/*@ define:module:slayer
+---
+name: Slayer
+subtitle: Let it rain blood
+description: |
+  Provides styling for slayer keys and superior uniques. Also does area-based item filtering for slayer monsters.
+*/
+/*@ define:input:slayer
+type: style
+label: Larran's key
+group: Slayer Keys
+exampleItem: Larran's key
+*/
+#define VAR_SLAYER_LARRANS_KEY_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#00ad9715";borderColor = "#00ffffff";textAccentColor = "#FF000000";lootbeamColor = "#ffffffff";menuTextColor = "#ffe670b3";fontType = 3;showLootbeam = true;icon = CurrentItem();
+
+/*@ define:input:slayer
+type: style
+label: Brimstone key
+group: Slayer Keys
+exampleItem: Brimstone key
+*/
+#define VAR_SLAYER_BRIMSTONE_KEY_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#00ad9715";borderColor = "#00ffffff";textAccentColor = "#FF000000";lootbeamColor = "#ffffffff";menuTextColor = "#FF41a9b7";fontType = 3;showLootbeam = true;icon = CurrentItem();
+
+apply (name:"Larran's key") {
+    VAR_SLAYER_LARRANS_KEY_CUSTOMSTYLE 
+}
+apply (name:"Brimstone key") {
+    VAR_SLAYER_BRIMSTONE_KEY_CUSTOMSTYLE 
+}
+
+/*@ define:input:slayer
+type: style
+label: Dust battlestaff
+group: Superior Uniques
+exampleItem: Dust battlestaff
+*/
+#define VAR_SLAYER_DUST_BATTLESTAFF_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#5071603f";borderColor = "#FFFFFFFF";textAccentColor = "#FF000000";menuTextColor = "#FFbda069";showLootbeam = true;hideOverlay = true;
+
+/*@ define:input:slayer
+type: style
+label: Mist battlestaff
+group: Superior Uniques
+exampleItem: Mist battlestaff
+*/
+#define VAR_SLAYER_MIST_BATTLESTAFF_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#50847a83";borderColor = "#FFFFFFFF";textAccentColor = "#FF000000";menuTextColor = "#FFd0c0ce";showLootbeam = true;hideOverlay = true;
+
+/*@ define:input:slayer
+type: style
+label: Eternal gem
+group: Superior Uniques
+exampleItem: Eternal gem
+*/
+#define VAR_SLAYER_ETERNAL_GEM_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#5036aebc";borderColor = "#FF9fc34a";textAccentColor = "#FF000000";menuTextColor = "#FF36aebc";showLootbeam = true;hideOverlay = true;
+
+/*@ define:input:slayer
+type: style
+label: Imbued heart
+group: Superior Uniques
+exampleItem: Imbued heart
+*/
+#define VAR_SLAYER_IMBUED_HEART_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#5061374a";borderColor = "#FF432e43";textAccentColor = "#FF000000";menuTextColor = "#FFad6284";fontType = 3;showLootbeam = true;showValue = false;hideOverlay = true;
+
+apply (name:"Dust battlestaff") {
+    VAR_SLAYER_DUST_BATTLESTAFF_CUSTOMSTYLE 
+}
+apply (name:"Mist battlestaff") {
+    VAR_SLAYER_MIST_BATTLESTAFF_CUSTOMSTYLE 
+}
+apply (name:"Eternal gem") {
+    VAR_SLAYER_ETERNAL_GEM_CUSTOMSTYLE 
+}
+apply (name:"Imbued heart") {
+    VAR_SLAYER_IMBUED_HEART_CUSTOMSTYLE 
+}
+
+/*@ define:input:slayer
+type: enumlist
+label: Wilderness slayer drops force hidden
+group: Wilderness Slayer
+enum: [
+  "Slayer's enchantment"
+]
+*/
+#define VAR_SLAYER_WILDERNESS_SLAYER_HIDE ["Slayer's enchantment"]
+
+/*@ define:input:slayer
+type: enumlist
+label: Wilderness slayer drops force shown
+group: Wilderness Slayer
+enum: [
+  "Slayer's enchantment"
+]
+*/
+#define VAR_SLAYER_WILDERNESS_SLAYER_SHOW []
+
+apply (name:VAR_SLAYER_WILDERNESS_SLAYER_HIDE) {
+    hidden = true;
+}
+apply (name:VAR_SLAYER_WILDERNESS_SLAYER_SHOW) {
+    hidden = false;
+}
+#define CONST_SLAYER_WILDERNESS_SLAYER_CAVE_AREA [3323, 10044, 0, 3458, 10178, 0]
+/*@ define:input:slayer
+type: enumlist
+label: Wilderness slayer cave drops force hidden
+group: Wilderness Slayer
+enum: [
+  "Blighted entangle sack",
+  "Blighted anglerfish",
+  "Blighted manta ray",
+  "Blighted karambwan",
+  "Blighted teleport spell sack",
+  "Blighted ancient ice sack",
+  "Blighted vengeance sack",
+  "Blighted super restore(4)",
+  "Revenant cave teleport",
+  "Dareeyak teleport (tablet)",
+  "Wilderness crabs teleport",
+  "Carrallanger teleport (tablet)",
+  "Paddewwa teleport (tablet)",
+  "Annakarl teleport (tablet)",
+  "Lassar teleport (tablet)",
+  "Kharyrll teleport (tablet)",
+  "Senntisten teleport (tablet)",
+  "Ghorrock teleport (tablet)",
+  "Target teleport",
+  "Magic shortbow scroll",
+  "Ring of wealth scroll",
+  "Trouver parchment",
+  "Looting bag note"
+]
+*/
+#define VAR_SLAYER_WILDERNESS_SLAYER_CAVE_HIDE ["Blighted entangle sack","Blighted teleport spell sack","Target teleport"]
+
+/*@ define:input:slayer
+type: enumlist
+label: Wilderness slayer cave drops force shown
+group: Wilderness Slayer
+enum: [
+  "Blighted entangle sack",
+  "Blighted anglerfish",
+  "Blighted manta ray",
+  "Blighted karambwan",
+  "Blighted teleport spell sack",
+  "Blighted ancient ice sack",
+  "Blighted vengeance sack",
+  "Blighted super restore(4)",
+  "Revenant cave teleport",
+  "Dareeyak teleport (tablet)",
+  "Wilderness crabs teleport",
+  "Carrallanger teleport (tablet)",
+  "Paddewwa teleport (tablet)",
+  "Annakarl teleport (tablet)",
+  "Lassar teleport (tablet)",
+  "Kharyrll teleport (tablet)",
+  "Senntisten teleport (tablet)",
+  "Ghorrock teleport (tablet)",
+  "Target teleport",
+  "Magic shortbow scroll",
+  "Ring of wealth scroll",
+  "Trouver parchment",
+  "Looting bag note"
+]
+*/
+#define VAR_SLAYER_WILDERNESS_SLAYER_CAVE_SHOW []
+
+apply (area:CONST_SLAYER_WILDERNESS_SLAYER_CAVE_AREA && name:VAR_SLAYER_WILDERNESS_SLAYER_CAVE_HIDE) {
+    hidden = true;
+}
+apply (area:CONST_SLAYER_WILDERNESS_SLAYER_CAVE_AREA && name:VAR_SLAYER_WILDERNESS_SLAYER_CAVE_SHOW) {
+    hidden = false;
+}
+
+#define CONST_SLAYER_HYDRAS_AREA [1291, 10221, 0, 1341, 10279, 0]
+
+#define CONST_SLAYER_SMOKE_DEVILS_AREA [2376, 9408, 0, 2432, 9472, 0]
+/*@ define:input:slayer
+type: enumlist
+label: Unique drop force hidden
+group: Smoke Devils
+enum: [
+  "Occult necklace",
+  "Dragon chainbody"
+]
+*/
+#define VAR_SLAYER_SMOKE_DEVIL_UNIQUES_HIDE []
+
+/*@ define:input:slayer
+type: enumlist
+label: Unique drop force shown
+group: Smoke Devils
+enum: [
+  "Occult necklace",
+  "Dragon chainbody"
+]
+*/
+#define VAR_SLAYER_SMOKE_DEVIL_UNIQUES_SHOW []
+
+/*@ define:input:slayer
+type: enumlist
+label: Common drop force hidden
+group: Smoke Devils
+enum: [
+  "Adamant battleaxe",
+  "Adamantite bar",
+  "Air battlestaff",
+  "Air rune",
+  "Ashes",
+  "Black d'hide vambraces",
+  "Coal",
+  "Coins",
+  "Crossbow string",
+  "Fire battlestaff",
+  "Fire rune",
+  "Magic logs",
+  "Mithril plateskirt",
+  "Red d'hide body",
+  "Rune arrow",
+  "Rune chainbody",
+  "Rune dagger",
+  "Rune full helm",
+  "Runite bolts",
+  "Shark",
+  "Smoke rune",
+  "Soul rune",
+  "Steel bar",
+  "Ugthanki kebab"
+]
+*/
+#define VAR_SLAYER_SMOKE_DEVIL_COMMON_HIDE ["Adamant battleaxe","Adamantite bar","Air rune","Ashes","Coal","Coins","Crossbow string","Fire rune","Mithril plateskirt","Red d'hide body","Rune arrow","Runite bolts","Shark","Steel bar","Ugthanki kebab"]
+
+/*@ define:input:slayer
+type: enumlist
+label: Common drop force shown
+group: Smoke Devils
+enum: [
+  "Adamant battleaxe",
+  "Adamantite bar",
+  "Air battlestaff",
+  "Air rune",
+  "Ashes",
+  "Black d'hide vambraces",
+  "Coal",
+  "Coins",
+  "Crossbow string",
+  "Fire battlestaff",
+  "Fire rune",
+  "Magic logs",
+  "Mithril plateskirt",
+  "Red d'hide body",
+  "Rune arrow",
+  "Rune chainbody",
+  "Rune dagger",
+  "Rune full helm",
+  "Runite bolts",
+  "Shark",
+  "Smoke rune",
+  "Soul rune",
+  "Steel bar",
+  "Ugthanki kebab"
+]
+*/
+#define VAR_SLAYER_SMOKE_DEVIL_COMMON_SHOW []
+
+/*@ define:input:slayer
+type: enumlist
+label: Herb drop force hidden
+group: Smoke Devils
+enum: [
+  "Grimy guam leaf",
+  "Grimy marrentill",
+  "Grimy tarromin",
+  "Grimy harralander",
+  "Grimy ranarr weed",
+  "Grimy irit leaf",
+  "Grimy avantoe",
+  "Grimy kwuarm",
+  "Grimy cadantine",
+  "Grimy lantadyme",
+  "Grimy dwarf weed"
+]
+*/
+#define VAR_SLAYER_SMOKE_DEVIL_HERBS_HIDE []
+
+/*@ define:input:slayer
+type: enumlist
+label: Herb drop force shown
+group: Smoke Devils
+enum: [
+  "Grimy guam leaf",
+  "Grimy marrentill",
+  "Grimy tarromin",
+  "Grimy harralander",
+  "Grimy ranarr weed",
+  "Grimy irit leaf",
+  "Grimy avantoe",
+  "Grimy kwuarm",
+  "Grimy cadantine",
+  "Grimy lantadyme",
+  "Grimy dwarf weed"
+]
+*/
+#define VAR_SLAYER_SMOKE_DEVIL_HERBS_SHOW []
+
+apply (area:CONST_SLAYER_SMOKE_DEVILS_AREA && name:VAR_SLAYER_SMOKE_DEVIL_UNIQUES_HIDE) {
+    hidden = true;
+}
+apply (area:CONST_SLAYER_SMOKE_DEVILS_AREA && name:VAR_SLAYER_SMOKE_DEVIL_UNIQUES_SHOW) {
+    hidden = false;
+}
+apply (area:CONST_SLAYER_SMOKE_DEVILS_AREA && name:VAR_SLAYER_SMOKE_DEVIL_COMMON_HIDE) {
+    hidden = true;
+}
+apply (area:CONST_SLAYER_SMOKE_DEVILS_AREA && name:VAR_SLAYER_SMOKE_DEVIL_COMMON_SHOW) {
+    hidden = false;
+}
+apply (area:CONST_SLAYER_SMOKE_DEVILS_AREA && name:VAR_SLAYER_SMOKE_DEVIL_HERBS_HIDE) {
+    hidden = true;
+}
+apply (area:CONST_SLAYER_SMOKE_DEVILS_AREA && name:VAR_SLAYER_SMOKE_DEVIL_HERBS_SHOW) {
+    hidden = false;
+}
+
+#define CONST_SLAYER_ARAXYTES_AREA [3650, 9793, 0, 3716, 9870, 0]
+
+#define CONST_SLAYER_DARK_BEASTS_MOURNER_TUNNELS_AREA [1979, 4629, 0, 2043, 4678, 0]
+#define CONST_SLAYER_DARK_BEASTS_IORWERTH_DUNGEON_1_AREA [3151, 12415, 0, 3182, 12439, 0]
+#define CONST_SLAYER_DARK_BEASTS_IORWERTH_DUNGEON_2_AREA [3200, 12381, 0, 3243, 12407, 0]
+
+#define CONST_SLAYER_CAVE_KRAKEN_AREA [2238, 9983, 0, 2304, 10022, 0]
+
+#define CONST_SLAYER_ABYSSAL_DEMONS_ABYSSAL_AREA_AREA [3007, 4865, 0, 3070, 4926, 0]
+#define CONST_SLAYER_ABYSSAL_DEMONS_CATACOMBS_CENTER_AREA [1667, 10049, 0, 1685, 10065, 0]
+#define CONST_SLAYER_ABYSSAL_DEMONS_CATACOMBS_NORTH_AREA [1667, 10083, 0, 1681, 10102, 0]
+#define CONST_SLAYER_ABYSSAL_DEMONS_SLAYER_TOWER_TOP_AREA [3404, 3555, 2, 3431, 3581, 2]
+#define CONST_SLAYER_ABYSSAL_DEMONS_SLAYER_TOWER_BASEMENT_AREA [3429, 9953, 3, 3449, 9977, 3]
+#define CONST_SLAYER_ABYSSAL_DEMONS_WILDERNESS_SLAYER_CAVE_AREA [3331, 10151, 0, 3353, 10174, 0]
+
+#define CONST_SLAYER_DRAKES_AREA [1297, 10224, 1, 1363, 10260, 1]
+
+#define CONST_SLAYER_NECHRYAEL_SLAYER_TOWER_TOP_AREA [3431, 3555, 2, 3453, 3580, 2]
+#define CONST_SLAYER_NECHRYAEL_SLAYER_TOWER_BASEMENT_AREA [3399, 9977, 3, 3429, 9954, 3]
+#define CONST_SLAYER_GREATER_NECHRYAEL_CATACOMBS_AREA [1689, 10087, 0, 1712, 10075, 0]
+#define CONST_SLAYER_GREATER_NECHRYAEL_IORWERTH_NORTH_AREA [3216, 12449, 0, 3241, 12469, 0]
+#define CONST_SLAYER_GREATER_NECHRYAEL_IORWERTH_SOUTH_AREA [3213, 12410, 0, 3233, 12432, 0]
+#define CONST_SLAYER_GREATER_NECHRYAEL_WILDERNESS_SLAYER_CAVE_AREA [3329, 10095, 0, 3345, 10120, 0]
+
+#define CONST_SLAYER_GARGOYLES_AREA [0000, 0000, 0, 0000, 0000, 0]
+
+#define CONST_SLAYER_SKELETAL_WYVERNS_AREA [0000, 0000, 0, 0000, 0000, 0]
+
+#define CONST_SLAYER_KURASKS_AREA [0000, 0000, 0, 0000, 0000, 0]
+
+#define CONST_SLAYER_FOSSIL_ISLAND_WYVERNS_AREA [0000, 0000, 0, 0000, 0000, 0]
+
+#define CONST_SLAYER_DUST_DEVILS_AREA [0000, 0000, 0, 0000, 0000, 0]
+
+#define CONST_SLAYER_WYRMS_AREA [0000, 0000, 0, 0000, 0000, 0]
+
+#define CONST_SLAYER_CAVE_HORRORS_AREA [0000, 0000, 0, 0000, 0000, 0]
+
+#define CONST_SLAYER_ZYGOMITES_AREA [0000, 0000, 0, 0000, 0000, 0]
+
+#define CONST_SLAYER_WARPED_CREATURES_AREA [0000, 0000, 0, 0000, 0000, 0]
+
+#define CONST_SLAYER_TUROTHS_AREA [0000, 0000, 0, 0000, 0000, 0]
+
+#define CONST_SLAYER_JELLIES_AREA [0000, 0000, 0, 0000, 0000, 0]
+
+#define CONST_SLAYER_BLOODVELDS_AREA [0000, 0000, 0, 0000, 0000, 0]
+
+
+/*@ define:module:alchs
+---
+name: Alchs
+subtitle: Ka-ching!
+description: |
+  Provides styling options for common alchable items.
+*/
+
+/*@ define:input:alchs
+type: boolean
+label: Force items from the alchs list to be shown
+*/
+#define VAR_ALCHS_FORCE_SHOWN true
+
+apply (VAR_ALCHS_FORCE_SHOWN && name:VAR_ALCHS_ITEM_LIST) {
+    hidden = false;
+}
+
+/*@ define:input:alchs
+type: style
+label: Custom style for items on the alchs list
+exampleItem: Rune platelegs
+exampleItemId: 1079
+*/
+#define VAR_ALCHS_CUSTOMSTYLE menuTextColor = "#ffa2bd01";fontType = 3;icon = Sprite(41, 0);
+
+apply (name:VAR_ALCHS_ITEM_LIST) {
+    VAR_ALCHS_CUSTOMSTYLE
+}
+
+/*@ define:input:alchs
+type: stringlist
+label: List of alchables
+group: List of alchables
+*/
+#define VAR_ALCHS_ITEM_LIST ["Adamant platebody","Air battlestaff","Dragon battleaxe","Dragon dagger","Dragon halberd","Dragon longsword","Dragon mace","Dragon med helm","Dragon platelegs","Dragon plateskirt","Dragon scimitar","Earth battlestaff","Fire battlestaff","Lava battlestaff","Mystic air staff","Mystic earth staff","Mystic fire staff","Mystic lava staff","Mystic robe bottom","Mystic robe top","Mystic water staff","Onyx dragon bolts (e)","Rune 2h sword","Rune battleaxe","Rune chainbody","Rune full helm","Rune halberd","Rune hasta","Rune kiteshield","Rune longsword","Rune med helm","Rune pickaxe","Rune platebody","Rune platelegs","Rune plateskirt","Rune scimitar","Rune spear","Rune sq shield","Rune sword","Runite crossbow (u)","Runite limbs","Water battlestaff","Adamant 2h sword","Steel platebody","Mithril platebody","Mithril platelegs","Rune mace"]
+
+/*@ define:input:alchs
+type: boolean
+label: Dont let alchables get filtered out or restyled in future modules
+group: "Power User: Stop Filter Execution"
+*/
+#define VAR_ALCHS_TERMINATE false
+
+rule (VAR_ALCHS_TERMINATE && name:VAR_ALCHS_ITEM_LIST) {}
+
+/*@ define:module:runes
+---
+name: Runes
+subtitle: The magic things, not the armor
+description: |
+  Quantity thresholds, filters, and custom styling for runes.
+*/
+
+#define CONST_RUNE_NAMES [   "Air rune",   "Mind rune",   "Water rune",   "Earth rune",   "Fire rune",   "Body rune",   "Cosmic rune",   "Chaos rune",   "Nature rune",   "Law rune",   "Death rune",   "Sunfire rune",   "Astral rune",   "Blood rune",   "Soul rune",   "Wrath rune",   "Mist rune",   "Dust rune",   "Mud rune",   "Smoke rune",   "Steam rune",   "Lava rune", ]
+
+/*@ define:input:runes
+type: enumlist
+label: Runes to force hidden
+enum: [
+  "Air rune",
+  "Mind rune",
+  "Water rune",
+  "Earth rune",
+  "Fire rune",
+  "Body rune",
+  "Cosmic rune",
+  "Chaos rune",
+  "Nature rune",
+  "Law rune",
+  "Death rune",
+  "Sunfire rune",
+  "Astral rune",
+  "Blood rune",
+  "Soul rune",
+  "Wrath rune",
+  "Mist rune",
+  "Dust rune",
+  "Mud rune",
+  "Smoke rune",
+  "Steam rune",
+  "Lava rune"
+]
+*/
+#define VAR_RUNES_HIDE ["Body rune","Mind rune"]
+
+/*@ define:input:runes
+type: boolean
+label: Force runes to be shown if they're above min quantity
+*/
+#define VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY true
+
+/*@ define:input:runes
+type: number
+label: Air rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_AIR_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Water rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_WATER_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Earth rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_EARTH_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Fire rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_FIRE_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Mind rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_MIND_RUNE_MIN_QUANTITY 50000000
+
+/*@ define:input:runes
+type: number
+label: Body rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_BODY_RUNE_MIN_QUANTITY 50000000
+
+/*@ define:input:runes
+type: number
+label: Cosmic rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_COSMIC_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Chaos rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_CHAOS_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Nature rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_NATURE_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Law rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_LAW_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Death rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_DEATH_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Sunfire rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_SUNFIRE_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Astral rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_ASTRAL_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Blood rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_BLOOD_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Soul rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_SOUL_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Wrath rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_WRATH_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Mist rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_MIST_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Dust rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_DUST_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Mud rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_MUD_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Smoke rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_SMOKE_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Steam rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_STEAM_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: number
+label: Lava rune minimum quantity
+group: Runes Filtering
+*/
+#define VAR_LAVA_RUNE_MIN_QUANTITY 0
+
+/*@ define:input:runes
+type: style
+label: Air rune custom style
+group: Custom Styling
+exampleItem: Air rune
+*/
+#define VAR_AIR_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Mind rune custom style
+group: Custom Styling
+exampleItem: Mind rune
+*/
+#define VAR_MIND_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Water rune custom style
+group: Custom Styling
+exampleItem: Water rune
+*/
+#define VAR_WATER_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Earth rune custom style
+group: Custom Styling
+exampleItem: Earth rune
+*/
+#define VAR_EARTH_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Fire rune custom style
+group: Custom Styling
+exampleItem: Fire rune
+*/
+#define VAR_FIRE_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Body rune custom style
+group: Custom Styling
+exampleItem: Body rune
+*/
+#define VAR_BODY_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Cosmic rune custom style
+group: Custom Styling
+exampleItem: Cosmic rune
+*/
+#define VAR_COSMIC_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Chaos rune custom style
+group: Custom Styling
+exampleItem: Chaos rune
+*/
+#define VAR_CHAOS_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Nature rune custom style
+group: Custom Styling
+exampleItem: Nature rune
+*/
+#define VAR_NATURE_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Law rune custom style
+group: Custom Styling
+exampleItem: Law rune
+*/
+#define VAR_LAW_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Death rune custom style
+group: Custom Styling
+exampleItem: Death rune
+*/
+#define VAR_DEATH_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Sunfire rune custom style
+group: Custom Styling
+exampleItem: Sunfire rune
+*/
+#define VAR_SUNFIRE_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Astral rune custom style
+group: Custom Styling
+exampleItem: Astral rune
+*/
+#define VAR_ASTRAL_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Blood rune custom style
+group: Custom Styling
+exampleItem: Blood rune
+*/
+#define VAR_BLOOD_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Soul rune custom style
+group: Custom Styling
+exampleItem: Soul rune
+*/
+#define VAR_SOUL_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Wrath rune custom style
+group: Custom Styling
+exampleItem: Wrath rune
+*/
+#define VAR_WRATH_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Mist rune custom style
+group: Custom Styling
+exampleItem: Mist rune
+*/
+#define VAR_MIST_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Dust rune custom style
+group: Custom Styling
+exampleItem: Dust rune
+*/
+#define VAR_DUST_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Mud rune custom style
+group: Custom Styling
+exampleItem: Mud rune
+*/
+#define VAR_MUD_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Smoke rune custom style
+group: Custom Styling
+exampleItem: Smoke rune
+*/
+#define VAR_SMOKE_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Steam rune custom style
+group: Custom Styling
+exampleItem: Steam rune
+*/
+#define VAR_STEAM_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+/*@ define:input:runes
+type: style
+label: Lava rune custom style
+group: Custom Styling
+exampleItem: Lava rune
+*/
+#define VAR_LAVA_RUNE_CUSTOMSTYLE textColor = "#ffe0b9d7";backgroundColor = "#00e0dede";borderColor = "#00e0dede";textAccentColor = "#FF000000";menuTextColor = "#ffe0b9d7";fontType = 3;
+
+apply (name:VAR_RUNES_HIDE) {
+    hidden = true;
+}
+
+apply (name:"Air rune") {
+    VAR_AIR_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Air rune" && quantity:<VAR_AIR_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Mind rune") {
+    VAR_MIND_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Mind rune" && quantity:<VAR_MIND_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Water rune") {
+    VAR_WATER_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Water rune" && quantity:<VAR_WATER_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Earth rune") {
+    VAR_EARTH_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Earth rune" && quantity:<VAR_EARTH_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Fire rune") {
+    VAR_FIRE_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Fire rune" && quantity:<VAR_FIRE_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Body rune") {
+    VAR_BODY_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Body rune" && quantity:<VAR_BODY_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Cosmic rune") {
+    VAR_COSMIC_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Cosmic rune" && quantity:<VAR_COSMIC_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Chaos rune") {
+    VAR_CHAOS_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Chaos rune" && quantity:<VAR_CHAOS_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Nature rune") {
+    VAR_NATURE_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Nature rune" && quantity:<VAR_NATURE_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Law rune") {
+    VAR_LAW_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Law rune" && quantity:<VAR_LAW_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Death rune") {
+    VAR_DEATH_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Death rune" && quantity:<VAR_DEATH_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Sunfire rune") {
+    VAR_SUNFIRE_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Sunfire rune" && quantity:<VAR_SUNFIRE_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Astral rune") {
+    VAR_ASTRAL_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Astral rune" && quantity:<VAR_ASTRAL_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Blood rune") {
+    VAR_BLOOD_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Blood rune" && quantity:<VAR_BLOOD_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Soul rune") {
+    VAR_SOUL_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Soul rune" && quantity:<VAR_SOUL_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Wrath rune") {
+    VAR_WRATH_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Wrath rune" && quantity:<VAR_WRATH_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Mist rune") {
+    VAR_MIST_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Mist rune" && quantity:<VAR_MIST_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Dust rune") {
+    VAR_DUST_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Dust rune" && quantity:<VAR_DUST_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Mud rune") {
+    VAR_MUD_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Mud rune" && quantity:<VAR_MUD_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Smoke rune") {
+    VAR_SMOKE_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Smoke rune" && quantity:<VAR_SMOKE_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Steam rune") {
+    VAR_STEAM_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Steam rune" && quantity:<VAR_STEAM_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"Lava rune") {
+    VAR_LAVA_RUNE_CUSTOMSTYLE 
+}
+apply (name:"Lava rune" && quantity:<VAR_LAVA_RUNE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+
+apply (name:"Air rune" && quantity:>=VAR_AIR_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Mind rune" && quantity:>=VAR_MIND_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Water rune" && quantity:>=VAR_WATER_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Earth rune" && quantity:>=VAR_EARTH_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Fire rune" && quantity:>=VAR_FIRE_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Body rune" && quantity:>=VAR_BODY_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Cosmic rune" && quantity:>=VAR_COSMIC_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Chaos rune" && quantity:>=VAR_CHAOS_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Nature rune" && quantity:>=VAR_NATURE_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Law rune" && quantity:>=VAR_LAW_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Death rune" && quantity:>=VAR_DEATH_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Sunfire rune" && quantity:>=VAR_SUNFIRE_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Astral rune" && quantity:>=VAR_ASTRAL_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Blood rune" && quantity:>=VAR_BLOOD_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Soul rune" && quantity:>=VAR_SOUL_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Wrath rune" && quantity:>=VAR_WRATH_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Mist rune" && quantity:>=VAR_MIST_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Dust rune" && quantity:>=VAR_DUST_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Mud rune" && quantity:>=VAR_MUD_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Smoke rune" && quantity:>=VAR_SMOKE_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Steam rune" && quantity:>=VAR_STEAM_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+apply (name:"Lava rune" && quantity:>=VAR_LAVA_RUNE_MIN_QUANTITY && VAR_RUNES_SHOW_ABOVE_MIN_QUANTITY) {
+  hidden = false;
+}
+
+
+/*@ define:module:ores
+---
+name: Ores
+subtitle: The children yearn for the mines
+description: |
+  Quantity thresholds, filters, and custom styling for all ores. By default colors them based on the item color.
+*/
+
+/*@ define:input:ores
+type: enumlist
+label: Ores to force hidden
+enum: [
+  "Copper ore",
+  "Tin ore",
+  "Iron ore",
+  "Silver ore",
+  "Coal",
+  "Gold ore",
+  "Mithril ore",
+  "Adamantite ore",
+  "Runite ore",
+  "Daeyalt ore",
+  "Blasted ore",
+  "Blurite ore",
+  "Lovakite ore"
+]
+*/
+#define VAR_ORES_HIDE ["Copper ore","Tin ore","Blurite ore"]
+
+apply (name:VAR_ORES_HIDE) {
+    hidden = true;
+}
+
+/*@ define:input:ores
+type: number
+label: Copper ore minimum quantity
+group: Ore Filters
+*/
+#define VAR_COPPER_ORE_MIN_QUANTITY 1000
+
+apply (name:"copper ore" && quantity:<VAR_COPPER_ORE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+/*@ define:input:ores
+type: number
+label: Tin ore minimum quantity
+group: Ore Filters
+*/
+#define VAR_TIN_ORE_MIN_QUANTITY 1000
+
+apply (name:"tin ore" && quantity:<VAR_TIN_ORE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+/*@ define:input:ores
+type: number
+label: Iron ore minimum quantity
+group: Ore Filters
+*/
+#define VAR_IRON_ORE_MIN_QUANTITY 5
+
+apply (name:"iron ore" && quantity:<VAR_IRON_ORE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+/*@ define:input:ores
+type: number
+label: Silver ore minimum quantity
+group: Ore Filters
+*/
+#define VAR_SILVER_ORE_MIN_QUANTITY 5
+
+apply (name:"silver ore" && quantity:<VAR_SILVER_ORE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+/*@ define:input:ores
+type: number
+label: Coal minimum quantity
+group: Ore Filters
+*/
+#define VAR_COAL_ORE_MIN_QUANTITY 5
+
+apply (name:"coal" && quantity:<VAR_COAL_ORE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+/*@ define:input:ores
+type: number
+label: Gold ore minimum quantity
+group: Ore Filters
+*/
+#define VAR_GOLD_ORE_MIN_QUANTITY 5
+
+apply (name:"gold ore" && quantity:<VAR_GOLD_ORE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+/*@ define:input:ores
+type: number
+label: Mithril ore minimum quantity
+group: Ore Filters
+*/
+#define VAR_MITHRIL_ORE_MIN_QUANTITY 1
+
+apply (name:"mithril ore" && quantity:<VAR_MITHRIL_ORE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+/*@ define:input:ores
+type: number
+label: Adamantite ore minimum quantity
+group: Ore Filters
+*/
+#define VAR_ADAMANTITE_ORE_MIN_QUANTITY 1
+
+apply (name:"adamantite ore" && quantity:<VAR_ADAMANTITE_ORE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+/*@ define:input:ores
+type: number
+label: Runite ore minimum quantity
+group: Ore Filters
+*/
+#define VAR_RUNITE_ORE_MIN_QUANTITY 1
+
+apply (name:"runite ore" && quantity:<VAR_RUNITE_ORE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+/*@ define:input:ores
+type: number
+label: Daeyalt ore minimum quantity
+group: Ore Filters
+*/
+#define VAR_DAEYALT_ORE_MIN_QUANTITY 0
+
+apply (name:"daeyalt ore" && quantity:<VAR_DAEYALT_ORE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+/*@ define:input:ores
+type: number
+label: Blasted ore minimum quantity
+group: Ore Filters
+*/
+#define VAR_BLASTED_ORE_MIN_QUANTITY 0
+
+apply (name:"blasted ore" && quantity:<VAR_BLASTED_ORE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+/*@ define:input:ores
+type: number
+label: Blurite ore minimum quantity
+group: Ore Filters
+*/
+#define VAR_BLURITE_ORE_MIN_QUANTITY 0
+
+apply (name:"blurite ore" && quantity:<VAR_BLURITE_ORE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+/*@ define:input:ores
+type: number
+label: Lovakite ore minimum quantity
+group: Ore Filters
+*/
+#define VAR_LOVAKITE_ORE_MIN_QUANTITY 0
+
+apply (name:"lovakite ore" && quantity:<VAR_LOVAKITE_ORE_MIN_QUANTITY) {
+    hidden = true;
+}
+
+/*@ define:input:ores
+type: style
+label: Copper ore custom style
+group: Custom Styling
+exampleItem: Copper ore
+*/
+#define VAR_COPPER_ORE_CUSTOMSTYLE textColor = "#ffbcb9b9";backgroundColor = "#00d97d36";borderColor = "#00d97d36";textAccentColor = "#FF000000";menuTextColor = "#ffbcb9b9";fontType = 3;
+
+apply (name:"copper ore") {
+    VAR_COPPER_ORE_CUSTOMSTYLE 
+}
+
+/*@ define:input:ores
+type: style
+label: Tin ore custom style
+group: Custom Styling
+exampleItem: Tin ore
+*/
+#define VAR_TIN_ORE_CUSTOMSTYLE textColor = "#ffbcb9b9";backgroundColor = "#00d97d36";borderColor = "#00d97d36";textAccentColor = "#FF000000";menuTextColor = "#ffbcb9b9";fontType = 3;
+
+apply (name:"tin ore") {
+    VAR_TIN_ORE_CUSTOMSTYLE 
+}
+
+/*@ define:input:ores
+type: style
+label: Iron ore custom style
+group: Custom Styling
+exampleItem: Iron ore
+*/
+#define VAR_IRON_ORE_CUSTOMSTYLE textColor = "#ffbcb9b9";backgroundColor = "#00d97d36";borderColor = "#00d97d36";textAccentColor = "#FF000000";menuTextColor = "#ffbcb9b9";fontType = 3;
+
+apply (name:"iron ore") {
+    VAR_IRON_ORE_CUSTOMSTYLE 
+}
+
+/*@ define:input:ores
+type: style
+label: Silver ore custom style
+group: Custom Styling
+exampleItem: Silver ore
+*/
+#define VAR_SILVER_ORE_CUSTOMSTYLE textColor = "#ffbcb9b9";backgroundColor = "#00d97d36";borderColor = "#00d97d36";textAccentColor = "#FF000000";menuTextColor = "#ffbcb9b9";fontType = 3;
+
+apply (name:"silver ore") {
+    VAR_SILVER_ORE_CUSTOMSTYLE 
+}
+
+/*@ define:input:ores
+type: style
+label: Coal custom style
+group: Custom Styling
+exampleItem: Coal
+*/
+#define VAR_COAL_ORE_CUSTOMSTYLE textColor = "#ffbcb9b9";backgroundColor = "#00d97d36";borderColor = "#00d97d36";textAccentColor = "#FF000000";menuTextColor = "#ffbcb9b9";fontType = 3;
+
+apply (name:"coal") {
+    VAR_COAL_ORE_CUSTOMSTYLE 
+}
+
+/*@ define:input:ores
+type: style
+label: Gold ore custom style
+group: Custom Styling
+exampleItem: Gold ore
+*/
+#define VAR_GOLD_ORE_CUSTOMSTYLE textColor = "#ffbcb9b9";backgroundColor = "#00d97d36";borderColor = "#00d97d36";textAccentColor = "#FF000000";menuTextColor = "#ffbcb9b9";fontType = 3;
+
+apply (name:"gold ore") {
+    VAR_GOLD_ORE_CUSTOMSTYLE 
+}
+
+/*@ define:input:ores
+type: style
+label: Mithril ore custom style
+group: Custom Styling
+exampleItem: Mithril ore
+*/
+#define VAR_MITHRIL_ORE_CUSTOMSTYLE textColor = "#ffbcb9b9";backgroundColor = "#00d97d36";borderColor = "#00d97d36";textAccentColor = "#FF000000";menuTextColor = "#ffbcb9b9";fontType = 3;
+
+apply (name:"mithril ore") {
+    VAR_MITHRIL_ORE_CUSTOMSTYLE 
+}
+
+/*@ define:input:ores
+type: style
+label: Adamantite ore custom style
+group: Custom Styling
+exampleItem: Adamantite ore
+*/
+#define VAR_ADAMANTITE_ORE_CUSTOMSTYLE textColor = "#ffbcb9b9";backgroundColor = "#00d97d36";borderColor = "#00d97d36";textAccentColor = "#FF000000";menuTextColor = "#ffbcb9b9";fontType = 3;
+
+apply (name:"adamantite ore") {
+    VAR_ADAMANTITE_ORE_CUSTOMSTYLE 
+}
+
+/*@ define:input:ores
+type: style
+label: Runite ore custom style
+group: Custom Styling
+exampleItem: Runite ore
+*/
+#define VAR_RUNITE_ORE_CUSTOMSTYLE textColor = "#ffbcb9b9";backgroundColor = "#00d97d36";borderColor = "#00d97d36";textAccentColor = "#FF000000";menuTextColor = "#ffbcb9b9";fontType = 3;
+
+apply (name:"runite ore") {
+    VAR_RUNITE_ORE_CUSTOMSTYLE 
+}
+
+/*@ define:input:ores
+type: style
+label: Daeyalt ore custom style
+group: Custom Styling
+exampleItem: Daeyalt ore
+*/
+#define VAR_DAEYALT_ORE_CUSTOMSTYLE textColor = "#ffbcb9b9";backgroundColor = "#00d97d36";borderColor = "#00d97d36";textAccentColor = "#FF000000";menuTextColor = "#ffbcb9b9";fontType = 3;
+
+apply (name:"daeyalt ore") {
+    VAR_DAEYALT_ORE_CUSTOMSTYLE 
+}
+
+/*@ define:input:ores
+type: style
+label: Blasted ore custom style
+group: Custom Styling
+exampleItem: Blasted ore
+*/
+#define VAR_BLASTED_ORE_CUSTOMSTYLE textColor = "#ffbcb9b9";backgroundColor = "#00d97d36";borderColor = "#00d97d36";textAccentColor = "#FF000000";menuTextColor = "#ffbcb9b9";fontType = 3;
+
+apply (name:"blasted ore") {
+    VAR_BLASTED_ORE_CUSTOMSTYLE 
+}
+
+/*@ define:input:ores
+type: style
+label: Blurite ore custom style
+group: Custom Styling
+exampleItem: Blurite ore
+*/
+#define VAR_BLURITE_ORE_CUSTOMSTYLE textColor = "#ffbcb9b9";backgroundColor = "#00d97d36";borderColor = "#00d97d36";textAccentColor = "#FF000000";menuTextColor = "#ffbcb9b9";fontType = 3;
+
+apply (name:"blurite ore") {
+    VAR_BLURITE_ORE_CUSTOMSTYLE 
+}
+
+/*@ define:input:ores
+type: style
+label: Lovakite ore custom style
+group: Custom Styling
+exampleItem: Lovakite ore
+*/
+#define VAR_LOVAKITE_ORE_CUSTOMSTYLE textColor = "#ffbcb9b9";backgroundColor = "#00d97d36";borderColor = "#00d97d36";textAccentColor = "#FF000000";menuTextColor = "#ffbcb9b9";fontType = 3;
+
+apply (name:"lovakite ore") {
+    VAR_LOVAKITE_ORE_CUSTOMSTYLE 
+}
+
+
+/*@ define:module:herbs
+---
+name: Herbs
+subtitle: Kaqemeex would be proud
+description: |
+  Provides herb filters, quantity filters per herb, and custom styling for each herb. By default, this gives each herb unique styling.
+*/
+
+#define CONST_ALL_HERBS [   "*guam leaf",   "*marrentill",   "*tarromin",   "*harralander",   "*ranarr weed",   "*toadflax",   "*irit leaf",   "*avantoe",   "*kwuarm",   "*huasca",   "*snapdragon",   "*cadantine",   "*lantadyme",   "*dwarf weed",   "*torstol", ]
+
+/*@ define:input:herbs
+type: number
+label: Hide herbs below this value
+*/
+#define VAR_HERBS_MINIMUM_VALUE 0
+
+/*@ define:input:herbs
+type: enumlist
+label: Herbs to force hidden
+enum: [
+  {
+    "value": "*Guam leaf",
+    "label": "Guam leaf"
+  },
+  {
+    "value": "*Marrentill",
+    "label": "Marrentill"
+  },
+  {
+    "value": "*Tarromin",
+    "label": "Tarromin"
+  },
+  {
+    "value": "*Harralander",
+    "label": "Harralander"
+  },
+  {
+    "value": "*Ranarr weed",
+    "label": "Ranarr weed"
+  },
+  {
+    "value": "*Toadflax",
+    "label": "Toadflax"
+  },
+  {
+    "value": "*Irit leaf",
+    "label": "Irit leaf"
+  },
+  {
+    "value": "*Avantoe",
+    "label": "Avantoe"
+  },
+  {
+    "value": "*Kwuarm",
+    "label": "Kwuarm"
+  },
+  {
+    "value": "*Huasca",
+    "label": "Huasca"
+  },
+  {
+    "value": "*Snapdragon",
+    "label": "Snapdragon"
+  },
+  {
+    "value": "*Cadantine",
+    "label": "Cadantine"
+  },
+  {
+    "value": "*Lantadyme",
+    "label": "Lantadyme"
+  },
+  {
+    "value": "*Dwarf weed",
+    "label": "Dwarf weed"
+  },
+  {
+    "value": "*Torstol",
+    "label": "Torstol"
+  }
+]
+*/
+#define VAR_HERBS_HIDE ["*Guam leaf","*Marrentill"]
+
+/*@ define:input:herbs
+type: enumlist
+label: Herbs to force shown
+enum: [
+  {
+    "value": "*Guam leaf",
+    "label": "Guam leaf"
+  },
+  {
+    "value": "*Marrentill",
+    "label": "Marrentill"
+  },
+  {
+    "value": "*Tarromin",
+    "label": "Tarromin"
+  },
+  {
+    "value": "*Harralander",
+    "label": "Harralander"
+  },
+  {
+    "value": "*Ranarr weed",
+    "label": "Ranarr weed"
+  },
+  {
+    "value": "*Toadflax",
+    "label": "Toadflax"
+  },
+  {
+    "value": "*Irit leaf",
+    "label": "Irit leaf"
+  },
+  {
+    "value": "*Avantoe",
+    "label": "Avantoe"
+  },
+  {
+    "value": "*Kwuarm",
+    "label": "Kwuarm"
+  },
+  {
+    "value": "*Huasca",
+    "label": "Huasca"
+  },
+  {
+    "value": "*Snapdragon",
+    "label": "Snapdragon"
+  },
+  {
+    "value": "*Cadantine",
+    "label": "Cadantine"
+  },
+  {
+    "value": "*Lantadyme",
+    "label": "Lantadyme"
+  },
+  {
+    "value": "*Dwarf weed",
+    "label": "Dwarf weed"
+  },
+  {
+    "value": "*Torstol",
+    "label": "Torstol"
+  }
+]
+*/
+#define VAR_HERBS_SHOW ["*Ranarr weed","*Huasca","*Snapdragon","*Torstol","*Tarromin","*Harralander","*Toadflax","*Avantoe","*Irit leaf","*Kwuarm","*Cadantine","*Dwarf weed","*Lantadyme"]
+
+
+/*@ define:input:herbs
+type: style
+label: Guam leaf custom style
+group: Custom Styling
+exampleItem: Guam leaf
+*/
+#define VAR_HERBS_GUAM_LEAF_CUSTOMSTYLE textColor = "#ff9ed9a2";backgroundColor = "#0009540d";borderColor = "#009ed9a2";textAccentColor = "#FF000000";menuTextColor = "#ff9ed9a2";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:herbs
+type: style
+label: Marrentill custom style
+group: Custom Styling
+exampleItem: Marrentill
+*/
+#define VAR_HERBS_MARRENTILL_CUSTOMSTYLE textColor = "#ff9ed9a2";backgroundColor = "#0009540d";borderColor = "#009ed9a2";textAccentColor = "#FF000000";menuTextColor = "#ff9ed9a2";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:herbs
+type: style
+label: Tarromin custom style
+group: Custom Styling
+exampleItem: Tarromin
+*/
+#define VAR_HERBS_TARROMIN_CUSTOMSTYLE textColor = "#ff9ed9a2";backgroundColor = "#0009540d";borderColor = "#009ed9a2";textAccentColor = "#FF000000";menuTextColor = "#ff9ed9a2";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:herbs
+type: style
+label: Harralander custom style
+group: Custom Styling
+exampleItem: Harralander
+*/
+#define VAR_HERBS_HARRALANDER_CUSTOMSTYLE textColor = "#ff9ed9a2";backgroundColor = "#0009540d";borderColor = "#009ed9a2";textAccentColor = "#FF000000";menuTextColor = "#ff9ed9a2";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:herbs
+type: style
+label: Ranarr weed custom style
+group: Custom Styling
+exampleItem: Ranarr weed
+*/
+#define VAR_HERBS_RANARR_WEED_CUSTOMSTYLE textColor = "#ff9ed9a2";backgroundColor = "#0009540d";borderColor = "#009ed9a2";textAccentColor = "#FF000000";menuTextColor = "#ff9ed9a2";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:herbs
+type: style
+label: Toadflax custom style
+group: Custom Styling
+exampleItem: Toadflax
+*/
+#define VAR_HERBS_TOADFLAX_CUSTOMSTYLE textColor = "#ff9ed9a2";backgroundColor = "#0009540d";borderColor = "#009ed9a2";textAccentColor = "#FF000000";menuTextColor = "#ff9ed9a2";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:herbs
+type: style
+label: Irit leaf custom style
+group: Custom Styling
+exampleItem: Irit leaf
+*/
+#define VAR_HERBS_IRIT_LEAF_CUSTOMSTYLE textColor = "#ff9ed9a2";backgroundColor = "#0009540d";borderColor = "#009ed9a2";textAccentColor = "#FF000000";menuTextColor = "#ff9ed9a2";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:herbs
+type: style
+label: Avantoe custom style
+group: Custom Styling
+exampleItem: Avantoe
+*/
+#define VAR_HERBS_AVANTOE_CUSTOMSTYLE textColor = "#ff9ed9a2";backgroundColor = "#0009540d";borderColor = "#009ed9a2";textAccentColor = "#FF000000";menuTextColor = "#ff9ed9a2";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:herbs
+type: style
+label: Kwuarm custom style
+group: Custom Styling
+exampleItem: Kwuarm
+*/
+#define VAR_HERBS_KWUARM_CUSTOMSTYLE textColor = "#ff9ed9a2";backgroundColor = "#0009540d";borderColor = "#009ed9a2";textAccentColor = "#FF000000";menuTextColor = "#ff9ed9a2";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:herbs
+type: style
+label: Huasca custom style
+group: Custom Styling
+exampleItem: Huasca
+*/
+#define VAR_HERBS_HUASCA_CUSTOMSTYLE textColor = "#ff9ed9a2";backgroundColor = "#0009540d";borderColor = "#009ed9a2";textAccentColor = "#FF000000";menuTextColor = "#ff9ed9a2";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:herbs
+type: style
+label: Snapdragon custom style
+group: Custom Styling
+exampleItem: Snapdragon
+*/
+#define VAR_HERBS_SNAPDRAGON_CUSTOMSTYLE textColor = "#ff9ed9a2";backgroundColor = "#0009540d";borderColor = "#009ed9a2";textAccentColor = "#FF000000";menuTextColor = "#ff9ed9a2";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:herbs
+type: style
+label: Cadantine custom style
+group: Custom Styling
+exampleItem: Cadantine
+*/
+#define VAR_HERBS_CADANTINE_CUSTOMSTYLE textColor = "#ff9ed9a2";backgroundColor = "#0009540d";borderColor = "#009ed9a2";textAccentColor = "#FF000000";menuTextColor = "#ff9ed9a2";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:herbs
+type: style
+label: Lantadyme custom style
+group: Custom Styling
+exampleItem: Lantadyme
+*/
+#define VAR_HERBS_LANTADYME_CUSTOMSTYLE textColor = "#ff9ed9a2";backgroundColor = "#0009540d";borderColor = "#009ed9a2";textAccentColor = "#FF000000";menuTextColor = "#ff9ed9a2";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:herbs
+type: style
+label: Dwarf weed custom style
+group: Custom Styling
+exampleItem: Dwarf weed
+*/
+#define VAR_HERBS_DWARF_WEED_CUSTOMSTYLE textColor = "#ff9ed9a2";backgroundColor = "#0009540d";borderColor = "#009ed9a2";textAccentColor = "#FF000000";menuTextColor = "#ff9ed9a2";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:herbs
+type: style
+label: Torstol custom style
+group: Custom Styling
+exampleItem: Torstol
+*/
+#define VAR_HERBS_TORSTOL_CUSTOMSTYLE textColor = "#ff9ed9a2";backgroundColor = "#0009540d";borderColor = "#009ed9a2";textAccentColor = "#FF000000";menuTextColor = "#ff9ed9a2";fontType = 3;icon = CurrentItem();
+
+
+/*@ define:input:herbs
+type: number
+label: Guam leaf minimum quantity
+group: Herb Quantity Filtering
+*/
+#define VAR_HERBS_GUAM_LEAF_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Marrentill minimum quantity
+group: Herb Quantity Filtering
+*/
+#define VAR_HERBS_MARRENTILL_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Tarromin minimum quantity
+group: Herb Quantity Filtering
+*/
+#define VAR_HERBS_TARROMIN_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Harralander minimum quantity
+group: Herb Quantity Filtering
+*/
+#define VAR_HERBS_HARRALANDER_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Ranarr weed minimum quantity
+group: Herb Quantity Filtering
+*/
+#define VAR_HERBS_RANARR_WEED_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Toadflax minimum quantity
+group: Herb Quantity Filtering
+*/
+#define VAR_HERBS_TOADFLAX_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Irit leaf minimum quantity
+group: Herb Quantity Filtering
+*/
+#define VAR_HERBS_IRIT_LEAF_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Avantoe minimum quantity
+group: Herb Quantity Filtering
+*/
+#define VAR_HERBS_AVANTOE_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Kwuarm minimum quantity
+group: Herb Quantity Filtering
+*/
+#define VAR_HERBS_KWUARM_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Huasca minimum quantity
+group: Herb Quantity Filtering
+*/
+#define VAR_HERBS_HUASCA_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Snapdragon minimum quantity
+group: Herb Quantity Filtering
+*/
+#define VAR_HERBS_SNAPDRAGON_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Cadantine minimum quantity
+group: Herb Quantity Filtering
+*/
+#define VAR_HERBS_CADANTINE_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Lantadyme minimum quantity
+group: Herb Quantity Filtering
+*/
+#define VAR_HERBS_LANTADYME_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Dwarf weed minimum quantity
+group: Herb Quantity Filtering
+*/
+#define VAR_HERBS_DWARF_WEED_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Torstol minimum quantity
+group: Herb Quantity Filtering
+*/
+#define VAR_HERBS_TORSTOL_MIN_QUANTITY 0
+
+
+/*@ define:input:herbs
+type: number
+label: Guam leaf minimum quantity
+group: Noted Herb Quantity Filtering
+*/
+#define VAR_HERBS_GUAM_LEAF_NOTED_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Marrentill minimum quantity
+group: Noted Herb Quantity Filtering
+*/
+#define VAR_HERBS_MARRENTILL_NOTED_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Tarromin minimum quantity
+group: Noted Herb Quantity Filtering
+*/
+#define VAR_HERBS_TARROMIN_NOTED_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Harralander minimum quantity
+group: Noted Herb Quantity Filtering
+*/
+#define VAR_HERBS_HARRALANDER_NOTED_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Ranarr weed minimum quantity
+group: Noted Herb Quantity Filtering
+*/
+#define VAR_HERBS_RANARR_WEED_NOTED_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Toadflax minimum quantity
+group: Noted Herb Quantity Filtering
+*/
+#define VAR_HERBS_TOADFLAX_NOTED_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Irit leaf minimum quantity
+group: Noted Herb Quantity Filtering
+*/
+#define VAR_HERBS_IRIT_LEAF_NOTED_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Avantoe minimum quantity
+group: Noted Herb Quantity Filtering
+*/
+#define VAR_HERBS_AVANTOE_NOTED_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Kwuarm minimum quantity
+group: Noted Herb Quantity Filtering
+*/
+#define VAR_HERBS_KWUARM_NOTED_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Huasca minimum quantity
+group: Noted Herb Quantity Filtering
+*/
+#define VAR_HERBS_HUASCA_NOTED_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Snapdragon minimum quantity
+group: Noted Herb Quantity Filtering
+*/
+#define VAR_HERBS_SNAPDRAGON_NOTED_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Cadantine minimum quantity
+group: Noted Herb Quantity Filtering
+*/
+#define VAR_HERBS_CADANTINE_NOTED_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Lantadyme minimum quantity
+group: Noted Herb Quantity Filtering
+*/
+#define VAR_HERBS_LANTADYME_NOTED_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Dwarf weed minimum quantity
+group: Noted Herb Quantity Filtering
+*/
+#define VAR_HERBS_DWARF_WEED_NOTED_MIN_QUANTITY 0
+
+/*@ define:input:herbs
+type: number
+label: Torstol minimum quantity
+group: Noted Herb Quantity Filtering
+*/
+#define VAR_HERBS_TORSTOL_NOTED_MIN_QUANTITY 0
+
+
+apply (name:CONST_ALL_HERBS && value:<VAR_HERBS_MINIMUM_VALUE) {
+    hidden = true;
+}
+apply (name:VAR_HERBS_SHOW) {
+    hidden = false;
+}
+apply (name:VAR_HERBS_HIDE) {
+    hidden = true;
+}
+
+apply (name:"*guam leaf") {
+    VAR_HERBS_GUAM_LEAF_CUSTOMSTYLE 
+}
+apply (name:"*guam leaf" && quantity:<VAR_HERBS_GUAM_LEAF_MIN_QUANTITY) {
+    hidden = true;
+}
+apply (name:"*guam leaf" && noted:true && quantity:<VAR_HERBS_GUAM_LEAF_NOTED_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"*marrentill") {
+    VAR_HERBS_MARRENTILL_CUSTOMSTYLE 
+}
+apply (name:"*marrentill" && quantity:<VAR_HERBS_MARRENTILL_MIN_QUANTITY) {
+    hidden = true;
+}
+apply (name:"*marrentill" && noted:true && quantity:<VAR_HERBS_MARRENTILL_NOTED_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"*tarromin") {
+    VAR_HERBS_TARROMIN_CUSTOMSTYLE 
+}
+apply (name:"*tarromin" && quantity:<VAR_HERBS_TARROMIN_MIN_QUANTITY) {
+    hidden = true;
+}
+apply (name:"*tarromin" && noted:true && quantity:<VAR_HERBS_TARROMIN_NOTED_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"*harralander") {
+    VAR_HERBS_HARRALANDER_CUSTOMSTYLE 
+}
+apply (name:"*harralander" && quantity:<VAR_HERBS_HARRALANDER_MIN_QUANTITY) {
+    hidden = true;
+}
+apply (name:"*harralander" && noted:true && quantity:<VAR_HERBS_HARRALANDER_NOTED_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"*ranarr weed") {
+    VAR_HERBS_RANARR_WEED_CUSTOMSTYLE 
+}
+apply (name:"*ranarr weed" && quantity:<VAR_HERBS_RANARR_WEED_MIN_QUANTITY) {
+    hidden = true;
+}
+apply (name:"*ranarr weed" && noted:true && quantity:<VAR_HERBS_RANARR_WEED_NOTED_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"*toadflax") {
+    VAR_HERBS_TOADFLAX_CUSTOMSTYLE 
+}
+apply (name:"*toadflax" && quantity:<VAR_HERBS_TOADFLAX_MIN_QUANTITY) {
+    hidden = true;
+}
+apply (name:"*toadflax" && noted:true && quantity:<VAR_HERBS_TOADFLAX_NOTED_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"*irit leaf") {
+    VAR_HERBS_IRIT_LEAF_CUSTOMSTYLE 
+}
+apply (name:"*irit leaf" && quantity:<VAR_HERBS_IRIT_LEAF_MIN_QUANTITY) {
+    hidden = true;
+}
+apply (name:"*irit leaf" && noted:true && quantity:<VAR_HERBS_IRIT_LEAF_NOTED_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"*avantoe") {
+    VAR_HERBS_AVANTOE_CUSTOMSTYLE 
+}
+apply (name:"*avantoe" && quantity:<VAR_HERBS_AVANTOE_MIN_QUANTITY) {
+    hidden = true;
+}
+apply (name:"*avantoe" && noted:true && quantity:<VAR_HERBS_AVANTOE_NOTED_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"*kwuarm") {
+    VAR_HERBS_KWUARM_CUSTOMSTYLE 
+}
+apply (name:"*kwuarm" && quantity:<VAR_HERBS_KWUARM_MIN_QUANTITY) {
+    hidden = true;
+}
+apply (name:"*kwuarm" && noted:true && quantity:<VAR_HERBS_KWUARM_NOTED_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"*huasca") {
+    VAR_HERBS_HUASCA_CUSTOMSTYLE 
+}
+apply (name:"*huasca" && quantity:<VAR_HERBS_HUASCA_MIN_QUANTITY) {
+    hidden = true;
+}
+apply (name:"*huasca" && noted:true && quantity:<VAR_HERBS_HUASCA_NOTED_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"*snapdragon") {
+    VAR_HERBS_SNAPDRAGON_CUSTOMSTYLE 
+}
+apply (name:"*snapdragon" && quantity:<VAR_HERBS_SNAPDRAGON_MIN_QUANTITY) {
+    hidden = true;
+}
+apply (name:"*snapdragon" && noted:true && quantity:<VAR_HERBS_SNAPDRAGON_NOTED_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"*cadantine") {
+    VAR_HERBS_CADANTINE_CUSTOMSTYLE 
+}
+apply (name:"*cadantine" && quantity:<VAR_HERBS_CADANTINE_MIN_QUANTITY) {
+    hidden = true;
+}
+apply (name:"*cadantine" && noted:true && quantity:<VAR_HERBS_CADANTINE_NOTED_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"*lantadyme") {
+    VAR_HERBS_LANTADYME_CUSTOMSTYLE 
+}
+apply (name:"*lantadyme" && quantity:<VAR_HERBS_LANTADYME_MIN_QUANTITY) {
+    hidden = true;
+}
+apply (name:"*lantadyme" && noted:true && quantity:<VAR_HERBS_LANTADYME_NOTED_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"*dwarf weed") {
+    VAR_HERBS_DWARF_WEED_CUSTOMSTYLE 
+}
+apply (name:"*dwarf weed" && quantity:<VAR_HERBS_DWARF_WEED_MIN_QUANTITY) {
+    hidden = true;
+}
+apply (name:"*dwarf weed" && noted:true && quantity:<VAR_HERBS_DWARF_WEED_NOTED_MIN_QUANTITY) {
+    hidden = true;
+}
+
+apply (name:"*torstol") {
+    VAR_HERBS_TORSTOL_CUSTOMSTYLE 
+}
+apply (name:"*torstol" && quantity:<VAR_HERBS_TORSTOL_MIN_QUANTITY) {
+    hidden = true;
+}
+apply (name:"*torstol" && noted:true && quantity:<VAR_HERBS_TORSTOL_NOTED_MIN_QUANTITY) {
+    hidden = true;
+}
+
+
+
+/*@ define:module:farming_seeds
+---
+name: Farming seeds
+subtitle: The stuff from the master farmers' pockets
+description: |
+  Provides specific seed filters and value threshold for filtering out seeds from being shown. The default is to hide lower tier seeds.
+*/
+
+/*@ define:input:farming_seeds
+type: number
+label: Hide seeds below this value
+*/
+#define VAR_FARMING_SEEDS_MINIMUM_VALUE 0
+
+apply ((name:CONST_FARMING_SEEDS_ALLOTMENT_LIST || name:CONST_FARMING_SEEDS_FLOWER_LIST || name:CONST_FARMING_SEEDS_HERB_LIST || name:CONST_FARMING_SEEDS_HOPS_LIST || name:CONST_FARMING_SEEDS_BUSH_LIST || name:CONST_FARMING_SEEDS_TREE_LIST || name:CONST_FARMING_SEEDS_FRUIT_TREE_LIST || name:CONST_FARMING_SEEDS_SPECIAL_TREE_LIST || name:CONST_FARMING_SEEDS_SPECIAL_LIST || name:CONST_FARMING_SEEDS_ANIMA_LIST) && value:<VAR_FARMING_SEEDS_MINIMUM_VALUE) {
+    hidden = true;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Allotment seeds to force hidden
+group: Seeds to hide
+enum: [
+  "Potato seed",
+  "Onion seed",
+  "Cabbage seed",
+  "Tomato seed",
+  "Sweetcorn seed",
+  "Strawberry seed",
+  "Watermelon seed",
+  "Snape grass seed"
+]
+*/
+#define VAR_FARMING_SEEDS_ALLOTMENT_HIDE ["Potato seed","Onion seed","Cabbage seed","Tomato seed","Sweetcorn seed","Strawberry seed"]
+
+apply (name:VAR_FARMING_SEEDS_ALLOTMENT_HIDE) {
+    hidden = true;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Flower seeds to force hidden
+group: Seeds to hide
+enum: [
+  "Marigold seed",
+  "Rosemary seed",
+  "Nasturtium seed",
+  "Woad seed",
+  "Limpwurt seed",
+  "White lily seed"
+]
+*/
+#define VAR_FARMING_SEEDS_FLOWER_HIDE ["Marigold seed","Rosemary seed","Nasturtium seed","Woad seed"]
+
+apply (name:VAR_FARMING_SEEDS_FLOWER_HIDE) {
+    hidden = true;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Herb seeds to force hidden
+group: Seeds to hide
+enum: [
+  "Guam seed",
+  "Marrentill seed",
+  "Tarromin seed",
+  "Harralander seed",
+  "Ranarr seed",
+  "Toadflax seed",
+  "Irit seed",
+  "Avantoe seed",
+  "Kwuarm seed",
+  "Snapdragon seed",
+  "Huasca seed",
+  "Cadantine seed",
+  "Lantadyme seed",
+  "Dwarf weed seed",
+  "Torstol seed"
+]
+*/
+#define VAR_FARMING_SEEDS_HERB_HIDE ["Guam seed","Marrentill seed","Tarromin seed","Harralander seed"]
+
+apply (name:VAR_FARMING_SEEDS_HERB_HIDE) {
+    hidden = true;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Hops seeds to force hidden
+group: Seeds to hide
+enum: [
+  "Barley seed",
+  "Hammerstone seed",
+  "Asgarnian seed",
+  "Jute seed",
+  "Yanillian seed",
+  "Krandorian seed",
+  "Wildblood seed"
+]
+*/
+#define VAR_FARMING_SEEDS_HOPS_HIDE ["Barley seed","Hammerstone seed","Asgarnian seed","Jute seed","Yanillian seed","Krandorian seed","Wildblood seed"]
+
+apply (name:VAR_FARMING_SEEDS_HOPS_HIDE) {
+    hidden = true;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Bush seeds to force hidden
+group: Seeds to hide
+enum: [
+  "Redberry seed",
+  "Cadavaberry seed",
+  "Dwellberry seed",
+  "Jangerberry seed",
+  "Whiteberry seed",
+  "Poison ivy seed"
+]
+*/
+#define VAR_FARMING_SEEDS_BUSH_HIDE ["Redberry seed","Cadavaberry seed","Dwellberry seed","Jangerberry seed","Poison ivy seed"]
+
+apply (name:VAR_FARMING_SEEDS_BUSH_HIDE) {
+    hidden = true;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Tree seeds to force hidden
+group: Seeds to hide
+enum: [
+  "Acorn",
+  "Willow seed",
+  "Maple seed",
+  "Yew seed",
+  "Magic seed"
+]
+*/
+#define VAR_FARMING_SEEDS_TREE_HIDE ["Acorn","Willow seed","Maple seed"]
+
+apply (name:VAR_FARMING_SEEDS_TREE_HIDE) {
+    hidden = true;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Fruit tree seeds to force hidden
+group: Seeds to hide
+enum: [
+  "Apple seed",
+  "Banana seed",
+  "Orange seed",
+  "Curry seed",
+  "Pineapple seed",
+  "Papaya seed",
+  "Palm tree seed",
+  "Dragonfruit seed"
+]
+*/
+#define VAR_FARMING_SEEDS_FRUIT_TREE_HIDE ["Apple seed","Banana seed","Orange seed","Curry seed","Pineapple seed"]
+
+apply (name:VAR_FARMING_SEEDS_FRUIT_TREE_HIDE) {
+    hidden = true;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Fruit tree seeds to force hidden
+group: Seeds to hide
+enum: [
+  "Teak seed",
+  "Mahogany seed",
+  "Calquat tree seed",
+  "Crystal acorn",
+  "Spirit seed",
+  "Celastrus seed",
+  "Redwood tree seed"
+]
+*/
+#define VAR_FARMING_SEEDS_SPECIAL_TREE_HIDE ["Teak seed","Mahogany seed","Calquat tree seed"]
+
+apply (name:VAR_FARMING_SEEDS_SPECIAL_TREE_HIDE) {
+    hidden = true;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Special seeds to force hidden
+group: Seeds to hide
+enum: [
+  "Seaweed spore",
+  "Grape seed",
+  "Mushroom spore",
+  "Belladonna seed",
+  "Hespori seed",
+  "Cactus seed",
+  "Potato cactus seed"
+]
+*/
+#define VAR_FARMING_SEEDS_SPECIAL_HIDE ["Grape seed","Mushroom spore","Belladonna seed","Cactus seed","Potato cactus seed"]
+
+apply (name:VAR_FARMING_SEEDS_SPECIAL_HIDE) {
+    hidden = true;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Anima seeds to force hidden
+group: Seeds to hide
+enum: [
+  "Kronos seed",
+  "Iasor seed",
+  "Attas seed"
+]
+*/
+#define VAR_FARMING_SEEDS_ANIMA_HIDE []
+
+apply (name:VAR_FARMING_SEEDS_ANIMA_HIDE) {
+    hidden = true;
+}
+
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Allotment seeds to force shown
+group: Seeds to Show
+enum: [
+  "Potato seed",
+  "Onion seed",
+  "Cabbage seed",
+  "Tomato seed",
+  "Sweetcorn seed",
+  "Strawberry seed",
+  "Watermelon seed",
+  "Snape grass seed"
+]
+*/
+#define VAR_FARMING_SEEDS_ALLOTMENT_SHOW ["Snape grass seed","Watermelon seed"]
+
+apply (name:VAR_FARMING_SEEDS_ALLOTMENT_SHOW) {
+    hidden = false;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Flower seeds to force shown
+group: Seeds to Show
+enum: [
+  "Marigold seed",
+  "Rosemary seed",
+  "Nasturtium seed",
+  "Woad seed",
+  "Limpwurt seed",
+  "White lily seed"
+]
+*/
+#define VAR_FARMING_SEEDS_FLOWER_SHOW ["Limpwurt seed"]
+
+apply (name:VAR_FARMING_SEEDS_FLOWER_SHOW) {
+    hidden = false;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Herb seeds to force shown
+group: Seeds to Show
+enum: [
+  "Guam seed",
+  "Marrentill seed",
+  "Tarromin seed",
+  "Harralander seed",
+  "Ranarr seed",
+  "Toadflax seed",
+  "Irit seed",
+  "Avantoe seed",
+  "Kwuarm seed",
+  "Snapdragon seed",
+  "Huasca seed",
+  "Cadantine seed",
+  "Lantadyme seed",
+  "Dwarf weed seed",
+  "Torstol seed"
+]
+*/
+#define VAR_FARMING_SEEDS_HERB_SHOW ["Ranarr seed","Irit seed","Kwuarm seed","Snapdragon seed","Huasca seed","Cadantine seed","Torstol seed","Lantadyme seed","Dwarf weed seed"]
+
+apply (name:VAR_FARMING_SEEDS_HERB_SHOW) {
+    hidden = false;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Hops seeds to force shown
+group: Seeds to Show
+enum: [
+  "Barley seed",
+  "Hammerstone seed",
+  "Asgarnian seed",
+  "Jute seed",
+  "Yanillian seed",
+  "Krandorian seed",
+  "Wildblood seed"
+]
+*/
+#define VAR_FARMING_SEEDS_HOPS_SHOW []
+
+apply (name:VAR_FARMING_SEEDS_HOPS_SHOW) {
+    hidden = false;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Bush seeds to force shown
+group: Seeds to Show
+enum: [
+  "Redberry seed",
+  "Cadavaberry seed",
+  "Dwellberry seed",
+  "Jangerberry seed",
+  "Whiteberry seed",
+  "Poison ivy seed"
+]
+*/
+#define VAR_FARMING_SEEDS_BUSH_SHOW []
+
+apply (name:VAR_FARMING_SEEDS_BUSH_SHOW) {
+    hidden = false;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Tree seeds to force shown
+group: Seeds to Show
+enum: [
+  "Acorn",
+  "Willow seed",
+  "Maple seed",
+  "Yew seed",
+  "Magic seed"
+]
+*/
+#define VAR_FARMING_SEEDS_TREE_SHOW ["Magic seed","Yew seed"]
+
+apply (name:VAR_FARMING_SEEDS_TREE_SHOW) {
+    hidden = false;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Fruit tree seeds to force shown
+group: Seeds to Show
+enum: [
+  "Apple seed",
+  "Banana seed",
+  "Orange seed",
+  "Curry seed",
+  "Pineapple seed",
+  "Papaya seed",
+  "Palm tree seed",
+  "Dragonfruit seed"
+]
+*/
+#define VAR_FARMING_SEEDS_FRUIT_TREE_SHOW ["Dragonfruit seed","Palm tree seed","Papaya seed"]
+
+apply (name:VAR_FARMING_SEEDS_FRUIT_TREE_SHOW) {
+    hidden = false;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Fruit tree seeds to force shown
+group: Seeds to Show
+enum: [
+  "Teak seed",
+  "Mahogany seed",
+  "Calquat tree seed",
+  "Crystal acorn",
+  "Spirit seed",
+  "Celastrus seed",
+  "Redwood tree seed"
+]
+*/
+#define VAR_FARMING_SEEDS_SPECIAL_TREE_SHOW ["Redwood tree seed","Celastrus seed","Spirit seed","Crystal acorn","Calquat tree seed","Mahogany seed","Teak seed"]
+
+apply (name:VAR_FARMING_SEEDS_SPECIAL_TREE_SHOW) {
+    hidden = false;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Special seeds to force shown
+group: Seeds to Show
+enum: [
+  "Seaweed spore",
+  "Grape seed",
+  "Mushroom spore",
+  "Belladonna seed",
+  "Hespori seed",
+  "Cactus seed",
+  "Potato cactus seed"
+]
+*/
+#define VAR_FARMING_SEEDS_SPECIAL_SHOW ["Seaweed spore","Hespori seed"]
+
+apply (name:VAR_FARMING_SEEDS_SPECIAL_SHOW) {
+    hidden = false;
+}
+
+/*@ define:input:farming_seeds
+type: enumlist
+label: Anima seeds to force shown
+group: Seeds to Show
+enum: [
+  "Kronos seed",
+  "Iasor seed",
+  "Attas seed"
+]
+*/
+#define VAR_FARMING_SEEDS_ANIMA_SHOW []
+
+apply (name:VAR_FARMING_SEEDS_ANIMA_SHOW) {
+    hidden = false;
+}
+
+/*@ define:module:food
+---
+name: Food
+subtitle: The stuff you eat
+description: |
+  This module provides filters based on food groups with some sane defaults. It also provides styling options available for every food group that has a filter. This can be done at the group level or on a food-by-food basis. A few popular foods have been given custom styling out of the box.
+*/
+
+#define CONST_HUNTER_FOODS_LIST [   "Cooked wild kebbit",   "Cooked larupia",   "Cooked barb-tailed kebbit",   "Cooked graahk",   "Cooked kyatt",   "Cooked pyre fox",   "Cooked sunlight antelope",   "Cooked dashing kebbit",   "Cooked moonlight antelope", ]
+
+#define CONST_FISH_FOODS_LIST [   "Shrimp",   "Sardine",   "Karambwanji",   "Herring",   "Anchovies",   "Mackerel",   "Trout",   "Cod",   "Pike",   "Slimy eel",   "Salmon",   "Tuna",   "Rainbow fish",   "Cave eel",   "Lobster",   "Bass",   "Swordfish",   "Lava eel",   "Monkfish",   "Cooked karambwan",   "Shark",   "Sea turtle",   "Manta ray",   "Anglerfish",   "Dark crab", ]
+
+/*@ define:input:food
+type: enumlist
+label: Hunter foods to force hidden
+group: Food filters
+enum: [
+  "Cooked wild kebbit",
+  "Cooked larupia",
+  "Cooked barb-tailed kebbit",
+  "Cooked graahk",
+  "Cooked kyatt",
+  "Cooked pyre fox",
+  "Cooked sunlight antelope",
+  "Cooked dashing kebbit",
+  "Cooked moonlight antelope"
+]
+*/
+#define VAR_FOOD_HUNTER_FOODS_HIDE ["Cooked wild kebbit","Cooked larupia","Cooked barb-tailed kebbit","Cooked graahk"]
+
+/*@ define:input:food
+type: enumlist
+label: Fish foods to force hidden
+group: Food filters
+enum: [
+  "Shrimp",
+  "Sardine",
+  "Karambwanji",
+  "Herring",
+  "Anchovies",
+  "Mackerel",
+  "Trout",
+  "Cod",
+  "Pike",
+  "Slimy eel",
+  "Salmon",
+  "Tuna",
+  "Rainbow fish",
+  "Cave eel",
+  "Lobster",
+  "Bass",
+  "Swordfish",
+  "Lava eel",
+  "Monkfish",
+  "Cooked karambwan",
+  "Shark",
+  "Sea turtle",
+  "Manta ray",
+  "Anglerfish",
+  "Dark crab"
+]
+*/
+#define VAR_FOOD_FISH_FOODS_HIDE ["Shrimp","Sardine","Herring","Anchovies","Mackerel","Trout","Cod","Pike","Salmon"]
+
+/*@ define:input:food
+type: enumlist
+label: Hunter foods to force shown
+group: Food filters
+enum: [
+  "Cooked wild kebbit",
+  "Cooked larupia",
+  "Cooked barb-tailed kebbit",
+  "Cooked graahk",
+  "Cooked kyatt",
+  "Cooked pyre fox",
+  "Cooked sunlight antelope",
+  "Cooked dashing kebbit",
+  "Cooked moonlight antelope"
+]
+*/
+#define VAR_FOOD_HUNTER_FOODS_SHOW ["Cooked sunlight antelope","Cooked dashing kebbit","Cooked moonlight antelope"]
+
+/*@ define:input:food
+type: enumlist
+label: Fish foods to force shown
+group: Food filters
+enum: [
+  "Shrimp",
+  "Sardine",
+  "Karambwanji",
+  "Herring",
+  "Anchovies",
+  "Mackerel",
+  "Trout",
+  "Cod",
+  "Pike",
+  "Slimy eel",
+  "Salmon",
+  "Tuna",
+  "Rainbow fish",
+  "Cave eel",
+  "Lobster",
+  "Bass",
+  "Swordfish",
+  "Lava eel",
+  "Monkfish",
+  "Cooked karambwan",
+  "Shark",
+  "Sea turtle",
+  "Manta ray",
+  "Anglerfish",
+  "Dark crab"
+]
+*/
+#define VAR_FOOD_FISH_FOODS_SHOW ["Swordfish","Lava eel","Monkfish","Cooked karambwan","Shark","Sea turtle","Manta ray","Anglerfish","Dark crab","Bass","Lobster","Tuna"]
+
+
+/*@ define:input:food
+type: style
+label: Hunter food style
+group: Food group style
+exampleItem: Cooked moonlight antelope
+*/
+#define VAR_FOOD_HUNTER_CUSTOMSTYLE fontType = 3;
+
+/*@ define:input:food
+type: style
+label: Fish food default style
+group: Food group style
+exampleItem: Tuna
+*/
+#define VAR_FOOD_FISH_CUSTOMSTYLE fontType = 3;
+
+/*@ define:input:food
+type: style
+label: Shrimp custom style
+group: Food style
+exampleItem: Shrimp
+*/
+#define VAR_SHRIMP_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Sardine custom style
+group: Food style
+exampleItem: Sardine
+*/
+#define VAR_SARDINE_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Karambwanji custom style
+group: Food style
+exampleItem: Karambwanji
+*/
+#define VAR_KARAMBWANJI_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Herring custom style
+group: Food style
+exampleItem: Herring
+*/
+#define VAR_HERRING_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Anchovies custom style
+group: Food style
+exampleItem: Anchovies
+*/
+#define VAR_ANCHOVIES_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Mackerel custom style
+group: Food style
+exampleItem: Mackerel
+*/
+#define VAR_MACKEREL_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Trout custom style
+group: Food style
+exampleItem: Trout
+*/
+#define VAR_TROUT_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Cod custom style
+group: Food style
+exampleItem: Cod
+*/
+#define VAR_COD_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Pike custom style
+group: Food style
+exampleItem: Pike
+*/
+#define VAR_PIKE_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Slimy eel custom style
+group: Food style
+exampleItem: Slimy eel
+*/
+#define VAR_SLIMY_EEL_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Salmon custom style
+group: Food style
+exampleItem: Salmon
+*/
+#define VAR_SALMON_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Tuna custom style
+group: Food style
+exampleItem: Tuna
+*/
+#define VAR_TUNA_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";textAccentColor = "#FF000000";menuTextColor = "#ffaf590a";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Rainbow fish custom style
+group: Food style
+exampleItem: Rainbow fish
+*/
+#define VAR_RAINBOW_FISH_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";textAccentColor = "#FF000000";menuTextColor = "#ffaf590a";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Cave eel custom style
+group: Food style
+exampleItem: Cave eel
+*/
+#define VAR_CAVE_EEL_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";textAccentColor = "#FF000000";menuTextColor = "#ffaf590a";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Lobster custom style
+group: Food style
+exampleItem: Lobster
+*/
+#define VAR_LOBSTER_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";textAccentColor = "#FF000000";menuTextColor = "#ffaf590a";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Bass custom style
+group: Food style
+exampleItem: Bass
+*/
+#define VAR_BASS_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";textAccentColor = "#FF000000";menuTextColor = "#ffaf590a";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Swordfish custom style
+group: Food style
+exampleItem: Swordfish
+*/
+#define VAR_SWORDFISH_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";textAccentColor = "#FF000000";menuTextColor = "#ffaf590a";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Lava eel custom style
+group: Food style
+exampleItem: Lava eel
+*/
+#define VAR_LAVA_EEL_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";textAccentColor = "#FF000000";menuTextColor = "#ffaf590a";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Monkfish custom style
+group: Food style
+exampleItem: Monkfish
+*/
+#define VAR_MONKFISH_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";textAccentColor = "#FF000000";menuTextColor = "#ffaf590a";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Karambwan custom style
+group: Food style
+exampleItem: Karambwan
+*/
+#define VAR_KARAMBWAN_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";textAccentColor = "#FF000000";menuTextColor = "#ffaf590a";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Shark custom style
+group: Food style
+exampleItem: Shark
+*/
+#define VAR_SHARK_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";textAccentColor = "#FF000000";menuTextColor = "#ffaf590a";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Sea turtle custom style
+group: Food style
+exampleItem: Sea turtle
+*/
+#define VAR_SEA_TURTLE_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";textAccentColor = "#FF000000";menuTextColor = "#ffaf590a";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Manta ray custom style
+group: Food style
+exampleItem: Manta ray
+*/
+#define VAR_MANTA_RAY_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";textAccentColor = "#FF000000";menuTextColor = "#ffaf590a";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Anglerfish custom style
+group: Food style
+exampleItem: Anglerfish
+*/
+#define VAR_ANGLERFISH_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";textAccentColor = "#FF000000";menuTextColor = "#ffaf590a";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:food
+type: style
+label: Dark crab custom style
+group: Food style
+exampleItem: Dark crab
+*/
+#define VAR_DARK_CRAB_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00000000";textAccentColor = "#FF000000";menuTextColor = "#ffaf590a";fontType = 3;icon = CurrentItem();
+
+apply (name:VAR_FOOD_HUNTER_FOODS_HIDE) {
+    hidden = true;
+}
+apply (name:VAR_FOOD_FISH_FOODS_HIDE) {
+    hidden = true;
+}
+apply (name:VAR_FOOD_HUNTER_FOODS_SHOW) {
+    hidden = false;
+}
+apply (name:VAR_FOOD_FISH_FOODS_SHOW) {
+    hidden = false;
+}
+
+apply (name:CONST_HUNTER_FOODS_LIST) {
+    VAR_FOOD_HUNTER_CUSTOMSTYLE 
+}
+apply (name:CONST_FISH_FOODS_LIST) {
+    VAR_FOOD_FISH_CUSTOMSTYLE 
+}
+apply (name:"Shrimp") {
+    VAR_SHRIMP_CUSTOMSTYLE 
+}
+apply (name:"Sardine") {
+    VAR_SARDINE_CUSTOMSTYLE 
+}
+apply (name:"Karambwanji") {
+    VAR_KARAMBWANJI_CUSTOMSTYLE 
+}
+apply (name:"Herring") {
+    VAR_HERRING_CUSTOMSTYLE 
+}
+apply (name:"Anchovies") {
+    VAR_ANCHOVIES_CUSTOMSTYLE 
+}
+apply (name:"Mackerel") {
+    VAR_MACKEREL_CUSTOMSTYLE 
+}
+apply (name:"Trout") {
+    VAR_TROUT_CUSTOMSTYLE 
+}
+apply (name:"Cod") {
+    VAR_COD_CUSTOMSTYLE 
+}
+apply (name:"Pike") {
+    VAR_PIKE_CUSTOMSTYLE 
+}
+apply (name:"Slimy eel") {
+    VAR_SLIMY_EEL_CUSTOMSTYLE 
+}
+apply (name:"Salmon") {
+    VAR_SALMON_CUSTOMSTYLE 
+}
+apply (name:"Tuna") {
+    VAR_TUNA_CUSTOMSTYLE 
+}
+apply (name:"Rainbow fish") {
+    VAR_RAINBOW_FISH_CUSTOMSTYLE 
+}
+apply (name:"Cave eel") {
+    VAR_CAVE_EEL_CUSTOMSTYLE 
+}
+apply (name:"Lobster") {
+    VAR_LOBSTER_CUSTOMSTYLE 
+}
+apply (name:"Bass") {
+    VAR_BASS_CUSTOMSTYLE 
+}
+apply (name:"Swordfish") {
+    VAR_SWORDFISH_CUSTOMSTYLE 
+}
+apply (name:"Lava eel") {
+    VAR_LAVA_EEL_CUSTOMSTYLE 
+}
+apply (name:"Monkfish") {
+    VAR_MONKFISH_CUSTOMSTYLE 
+}
+apply (name:"Cooked Karambwan") {
+    VAR_KARAMBWAN_CUSTOMSTYLE 
+}
+apply (name:"Shark") {
+    VAR_SHARK_CUSTOMSTYLE 
+}
+apply (name:"Sea turtle") {
+    VAR_SEA_TURTLE_CUSTOMSTYLE 
+}
+apply (name:"Manta ray") {
+    VAR_MANTA_RAY_CUSTOMSTYLE 
+}
+apply (name:"Anglerfish") {
+    VAR_ANGLERFISH_CUSTOMSTYLE 
+}
+apply (name:"Dark crab") {
+    VAR_DARK_CRAB_CUSTOMSTYLE 
+}
+
+
+/*@ define:module:gauntlet
+---
+name: Gauntlet
+subtitle: Crystal palace of suffering
+description: |
+  Filtering and style for the Gauntlet
+*/
+
+#define CONST_GAUNTLET_AREA [1856, 5632, 0, 1983, 5695, 3]
+
+/*@ define:input:gauntlet
+type: enumlist
+label: Tools to force hidden
+group: Filtering
+enum: [
+  {
+    "value": "* sceptre",
+    "label": "Crystal sceptre"
+  },
+  {
+    "value": "* harpoon",
+    "label": "Crystal harpoon"
+  },
+  {
+    "value": "* axe",
+    "label": "Crystal axe"
+  },
+  {
+    "value": "* pickaxe",
+    "label": "Crystal pickaxe"
+  },
+  {
+    "value": "Pestle and mortar",
+    "label": "Pestle and mortar"
+  },
+  {
+    "value": "*teleport crystal",
+    "label": "Teleport crystal"
+  },
+  {
+    "value": "*escape crystal",
+    "label": "Escape crystal"
+  }
+]
+*/
+#define VAR_GAUNTLET_TOOLS_HIDE ["* sceptre","* harpoon","* axe","* pickaxe","Pestle and mortar"]
+
+/*@ define:input:gauntlet
+type: enumlist
+label: Resources to force hidden
+group: Filtering
+enum: [
+  {
+    "value": "* shards",
+    "label": "Crystal shards"
+  },
+  {
+    "value": "Crystal dust",
+    "label": "Crystal dust"
+  },
+  {
+    "value": "Vial",
+    "label": "Vial"
+  },
+  {
+    "value": "Water-filled vial",
+    "label": "Water-filled vial"
+  },
+  {
+    "value": "Grym leaf",
+    "label": "Grym leaf"
+  },
+  {
+    "value": "Grym potion (unf)",
+    "label": "Grym potion (unf)"
+  },
+  {
+    "value": "Raw paddlefish",
+    "label": "Raw paddlefish"
+  },
+  {
+    "value": "Weapon frame",
+    "label": "Weapon frame"
+  },
+  {
+    "value": "* spike",
+    "label": "Crystal spike"
+  },
+  {
+    "value": "* orb",
+    "label": "Crystal orb"
+  },
+  {
+    "value": "* bowstring",
+    "label": "Crystalline bowstring"
+  },
+  {
+    "value": "Linum tirinum*",
+    "label": "Linum tirinum"
+  },
+  {
+    "value": "Phren bark*",
+    "label": "Phren bark"
+  },
+  {
+    "value": "* ore",
+    "label": "Crystal ore"
+  }
+]
+*/
+#define VAR_GAUNTLET_RESOURCES_HIDE ["Vial","Water-filled vial","Grym potion (unf)"]
+
+/*@ define:input:gauntlet
+type: enumlist
+label: Supplies to force hidden
+group: Filtering
+enum: [
+  {
+    "value": "Egniol potion (*",
+    "label": "Egniol potion"
+  },
+  {
+    "value": "Paddlefish",
+    "label": "Paddlefish"
+  },
+  {
+    "value": "Crystal paddlefish",
+    "label": "Crystal paddlefish"
+  },
+  {
+    "value": "Corrupted paddlefish",
+    "label": "Corrupted paddlefish"
+  }
+]
+*/
+#define VAR_GAUNTLET_SUPPLIES_HIDE ["Egniol potion (*"]
+
+/*@ define:input:gauntlet
+type: enumlist
+label: Equipment to force hidden
+group: Filtering
+enum: [
+  {
+    "value": "* halberd *",
+    "label": "Crystal halberd"
+  },
+  {
+    "value": "* bow *",
+    "label": "Crystal bow"
+  },
+  {
+    "value": "* staff *",
+    "label": "Crystal staff"
+  },
+  {
+    "value": "* helm *",
+    "label": "Crystal helm"
+  },
+  {
+    "value": "* body *",
+    "label": "Crystal body"
+  },
+  {
+    "value": "* legs *",
+    "label": "Crystal legs"
+  }
+]
+*/
+#define VAR_GAUNTLET_EQUIPMENT_HIDE []
+
+
+/*@ define:input:gauntlet
+type: style
+label: Crystal sceptre custom style
+group: Styling Tools
+exampleItem: Crystal sceptre
+*/
+#define VAR_GAUNTLET_CRYSTAL_SCEPTRE_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#5087735b";borderColor = "#FF657e7f";textAccentColor = "#FF000000";hideOverlay = true;
+
+/*@ define:input:gauntlet
+type: style
+label: Crystal axe custom style
+group: Styling Tools
+exampleItem: Crystal axe
+*/
+#define VAR_GAUNTLET_CRYSTAL_AXE_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#5087735b";borderColor = "#FF00ff00";textAccentColor = "#FF000000";hideOverlay = true;
+
+/*@ define:input:gauntlet
+type: style
+label: Crystal pickaxe custom style
+group: Styling Tools
+exampleItem: Crystal pickaxe
+*/
+#define VAR_GAUNTLET_CRYSTAL_PICKAXE_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#5087735b";borderColor = "#FFff0000";textAccentColor = "#FF000000";hideOverlay = true;
+
+/*@ define:input:gauntlet
+type: style
+label: Crystal harpoon custom style
+group: Styling Tools
+exampleItem: Crystal harpoon
+*/
+#define VAR_GAUNTLET_CRYSTAL_HARPOON_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#5087735b";borderColor = "#FF00ffff";textAccentColor = "#FF000000";hideOverlay = true;
+
+/*@ define:input:gauntlet
+type: style
+label: Pestle and mortar custom style
+group: Styling Tools
+exampleItem: Pestle and mortar
+*/
+#define VAR_GAUNTLET_PESTLE_AND_MORTAR_CUSTOMSTYLE hideOverlay = true;
+
+/*@ define:input:gauntlet
+type: style
+label: Teleport crystal custom style
+group: Styling Tools
+exampleItem: Teleport crystal
+*/
+#define VAR_GAUNTLET_TELEPORT_CRYSTAL_CUSTOMSTYLE textColor = "#ffffe84f";backgroundColor = "#00000000";borderColor = "#00ffffff";textAccentColor = "#FF000000";menuTextColor = "#ffffe84f";fontType = 3;
+
+/*@ define:input:gauntlet
+type: style
+label: Escape crystal custom style
+group: Styling Tools
+exampleItem: Escape crystal
+*/
+#define VAR_GAUNTLET_ESCAPE_CRYSTAL_CUSTOMSTYLE hideOverlay = true;
+
+
+/*@ define:input:gauntlet
+type: style
+label: Crystal shards custom style
+group: Styling Resources
+exampleItem: Crystal shards
+*/
+#define VAR_GAUNTLET_CRYSTAL_SHARDS_CUSTOMSTYLE textColor = "#ff0bfab2";menuTextColor = "#ff0bfab2";fontType = 3;
+
+/*@ define:input:gauntlet
+type: style
+label: Crystal dust custom style
+group: Styling Resources
+exampleItem: Crystal dust
+*/
+#define VAR_GAUNTLET_CRYSTAL_DUST_CUSTOMSTYLE textColor = "#ff0bfab2";menuTextColor = "#ff0bfab2";fontType = 3;
+
+/*@ define:input:gauntlet
+type: style
+label: Vial custom style
+group: Styling Resources
+exampleItem: Vial
+*/
+#define VAR_GAUNTLET_VIAL_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#50636165";borderColor = "#FFbeb8c2";textAccentColor = "#FF000000";menuTextColor = "#FFbeb8c2";hideOverlay = true;
+
+/*@ define:input:gauntlet
+type: style
+label: Water-filled vial custom style
+group: Styling Resources
+exampleItem: Water-filled vial
+*/
+#define VAR_GAUNTLET_WATER_FILLED_VIAL_CUSTOMSTYLE textColor = "#FFa7a8c0";backgroundColor = "#00a6a7bf";borderColor = "#00b9b3bd";textAccentColor = "#FF000000";menuTextColor = "#FFa7a8c0";fontType = 3;
+
+/*@ define:input:gauntlet
+type: style
+label: Grym leaf custom style
+group: Styling Resources
+exampleItem: Grym leaf
+*/
+#define VAR_GAUNTLET_GRYM_LEAF_CUSTOMSTYLE textColor = "#ff34c33d";backgroundColor = "#00ffff00";borderColor = "#00005706";textAccentColor = "#FF000000";menuTextColor = "#ff34c33d";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:gauntlet
+type: style
+label: Grym potion (unf) custom style
+group: Styling Resources
+exampleItem: Grym potion (unf)
+*/
+#define VAR_GAUNTLET_GRYM_POTION_UNF_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#50bfbcbb";borderColor = "#FFffff00";textAccentColor = "#FF000000";menuTextColor = "#FFbfbcbb";hideOverlay = true;
+
+/*@ define:input:gauntlet
+type: style
+label: Raw paddlefish custom style
+group: Styling Resources
+exampleItem: Raw paddlefish
+*/
+#define VAR_GAUNTLET_RAW_PADDLEFISH_CUSTOMSTYLE textColor = "#ff00fff7";backgroundColor = "#0035cc7e";borderColor = "#0000f7ff";textAccentColor = "#FF000000";menuTextColor = "#ff00fff7";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:gauntlet
+type: style
+label: Weapon frame custom style
+group: Styling Resources
+exampleItem: Weapon frame
+*/
+#define VAR_GAUNTLET_WEAPON_FRAME_CUSTOMSTYLE textColor = "#ffca5eeb";backgroundColor = "#0084608f";borderColor = "#0084608f";textAccentColor = "#FF000000";menuTextColor = "#ffca5eeb";fontType = 3;
+
+/*@ define:input:gauntlet
+type: style
+label: Crystal spike custom style
+group: Styling Resources
+exampleItem: Crystal spike
+*/
+#define VAR_GAUNTLET_CRYSTAL_SPIKE_CUSTOMSTYLE textColor = "#ffdc0000";backgroundColor = "#00ff0000";borderColor = "#00ff0000";textAccentColor = "#FF000000";menuTextColor = "#ffdc0000";fontType = 3;
+
+/*@ define:input:gauntlet
+type: style
+label: Crystal orb custom style
+group: Styling Resources
+exampleItem: Crystal orb
+*/
+#define VAR_GAUNTLET_CRYSTAL_ORB_CUSTOMSTYLE textColor = "#ff0089fa";backgroundColor = "#0000ffff";borderColor = "#0000ffff";textAccentColor = "#FF000000";lootbeamColor = "#ff0089fa";menuTextColor = "#ff0089fa";fontType = 3;showLootbeam = true;
+
+/*@ define:input:gauntlet
+type: style
+label: Crystalline bowstring custom style
+group: Styling Resources
+exampleItem: Crystalline bowstring
+*/
+#define VAR_GAUNTLET_CRYSTALLINE_BOWSTRING_CUSTOMSTYLE textColor = "#ff1e9e4d";backgroundColor = "#0000ff00";borderColor = "#0000ff00";textAccentColor = "#FF000000";lootbeamColor = "#ff1e9e4d";menuTextColor = "#ff1e9e4d";fontType = 3;showLootbeam = true;
+
+/*@ define:input:gauntlet
+type: style
+label: Linum tirinum custom style
+group: Styling Resources
+exampleItem: Linum tirinum
+*/
+#define VAR_GAUNTLET_LINUM_TIRINUM_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#00ffffff";borderColor = "#00ffffff";textAccentColor = "#FF000000";menuTextColor = "#FFffffff";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:gauntlet
+type: style
+label: Phren bark custom style
+group: Styling Resources
+exampleItem: Phren bark
+*/
+#define VAR_GAUNTLET_PHREN_BARK_CUSTOMSTYLE textColor = "#ff9e672b";backgroundColor = "#0000ff00";borderColor = "#0000ff00";textAccentColor = "#FF000000";menuTextColor = "#ff9e672b";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:gauntlet
+type: style
+label: Crystal ore custom style
+group: Styling Resources
+exampleItem: Crystal ore
+*/
+#define VAR_GAUNTLET_CRYSTAL_ORE_CUSTOMSTYLE textColor = "#ffed8383";backgroundColor = "#00ffffff";borderColor = "#00ff0000";textAccentColor = "#FF000000";menuTextColor = "#ffed8383";fontType = 3;icon = CurrentItem();
+
+
+/*@ define:input:gauntlet
+type: style
+label: Egniol potion custom style
+group: Styling Supplies
+exampleItem: Egniol potion (3)
+*/
+#define VAR_GAUNTLET_EGNIOL_POTION_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#50c4aa96";borderColor = "#FFc4aa96";textAccentColor = "#FF000000";menuTextColor = "#FFc4aa96";hideOverlay = true;
+
+/*@ define:input:gauntlet
+type: style
+label: Paddlefish custom style
+group: Styling Supplies
+exampleItem: Paddlefish
+*/
+#define VAR_GAUNTLET_PADDLEFISH_CUSTOMSTYLE textColor = "#ff047c78";backgroundColor = "#0035cc7e";borderColor = "#0000f7ff";textAccentColor = "#FF000000";menuTextColor = "#ff047c78";fontType = 3;icon = CurrentItem();
+
+/*@ define:input:gauntlet
+type: style
+label: Crystal paddlefish custom style
+group: Styling Supplies
+exampleItem: Crystal paddlefish
+*/
+#define VAR_GAUNTLET_CRYSTAL_PADDLEFISH_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#509d9d92";borderColor = "#FFa3c1c2";textAccentColor = "#FF000000";menuTextColor = "#FF9d9d92";hideOverlay = true;
+
+
+/*@ define:input:gauntlet
+type: style
+label: Crystal halberd custom style
+group: Styling Equipment
+exampleItem: Crystal halberd
+*/
+#define VAR_GAUNTLET_CRYSTAL_HALBERD_CUSTOMSTYLE hideOverlay = true;
+
+/*@ define:input:gauntlet
+type: style
+label: Crystal bow custom style
+group: Styling Equipment
+exampleItem: Crystal bow
+*/
+#define VAR_GAUNTLET_CRYSTAL_BOW_CUSTOMSTYLE hideOverlay = true;
+
+/*@ define:input:gauntlet
+type: style
+label: Crystal staff custom style
+group: Styling Equipment
+exampleItem: Crystal staff
+*/
+#define VAR_GAUNTLET_CRYSTAL_STAFF_CUSTOMSTYLE hideOverlay = true;
+
+/*@ define:input:gauntlet
+type: style
+label: Crystal helm custom style
+group: Styling Equipment
+exampleItem: Crystal helm
+*/
+#define VAR_GAUNTLET_CRYSTAL_HELM_CUSTOMSTYLE hideOverlay = true;
+
+/*@ define:input:gauntlet
+type: style
+label: Crystal body custom style
+group: Styling Equipment
+exampleItem: Crystal body
+*/
+#define VAR_GAUNTLET_CRYSTAL_BODY_CUSTOMSTYLE showDespawn = false;hideOverlay = true;
+
+/*@ define:input:gauntlet
+type: style
+label: Crystal legs custom style
+group: Styling Equipment
+exampleItem: Crystal legs
+*/
+#define VAR_GAUNTLET_CRYSTAL_LEGS_CUSTOMSTYLE hideOverlay = true;
+
+
+/*@ define:input:gauntlet
+type: style
+label: Basic equipment custom style
+group: Styling Equipment
+exampleItem: Crystal helm (basic)
+*/
+#define VAR_GAUNTLET_BASIC_CUSTOMSTYLE borderColor = "#FF5b462a";hideOverlay = true;
+
+/*@ define:input:gauntlet
+type: style
+label: Attuned equipment custom style
+group: Styling Equipment
+exampleItem: Crystal helm (attuned)
+*/
+#define VAR_GAUNTLET_ATTUNED_CUSTOMSTYLE borderColor = "#FFa8a8b4";hideOverlay = true;
+
+/*@ define:input:gauntlet
+type: style
+label: Perfected equipment custom style
+group: Styling Equipment
+exampleItem: Crystal helm (perfected)
+*/
+#define VAR_GAUNTLET_PERFECTED_CUSTOMSTYLE borderColor = "#FFd8b01a";hideOverlay = true;
+
+
+
+
+apply (area:CONST_GAUNTLET_AREA && name:VAR_GAUNTLET_TOOLS_HIDE) {
+    hidden = true;
+}
+apply (area:CONST_GAUNTLET_AREA && name:VAR_GAUNTLET_RESOURCES_HIDE) {
+    hidden = true;
+}
+apply (area:CONST_GAUNTLET_AREA && name:VAR_GAUNTLET_SUPPLIES_HIDE) {
+    hidden = true;
+}
+apply (area:CONST_GAUNTLET_AREA && name:VAR_GAUNTLET_EQUIPMENT_HIDE) {
+    hidden = true;
+}
+
+apply (area:CONST_GAUNTLET_AREA && name:"* sceptre") {
+    VAR_GAUNTLET_CRYSTAL_SCEPTRE_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:"* axe") {
+    VAR_GAUNTLET_CRYSTAL_AXE_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:"* pickaxe") {
+    VAR_GAUNTLET_CRYSTAL_PICKAXE_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:"* harpoon") {
+    VAR_GAUNTLET_CRYSTAL_HARPOON_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:"Pestle and mortar") {
+    VAR_GAUNTLET_PESTLE_AND_MORTAR_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:"*teleport crystal") {
+    VAR_GAUNTLET_TELEPORT_CRYSTAL_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:"*escape crystal") {
+    VAR_GAUNTLET_ESCAPE_CRYSTAL_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:"* shards") {
+    VAR_GAUNTLET_CRYSTAL_SHARDS_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:"Crystal dust") {
+    VAR_GAUNTLET_CRYSTAL_DUST_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:"Vial") {
+    VAR_GAUNTLET_VIAL_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:"Water-filled vial") {
+    VAR_GAUNTLET_WATER_FILLED_VIAL_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:"Grym leaf") {
+    VAR_GAUNTLET_GRYM_LEAF_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:"Grym potion (unf)") {
+    VAR_GAUNTLET_GRYM_POTION_UNF_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:"Egniol potion (*") {
+    VAR_GAUNTLET_EGNIOL_POTION_CUSTOMSTYLE
+}
+apply (area:CONST_GAUNTLET_AREA && name:"Raw paddlefish") {
+    VAR_GAUNTLET_RAW_PADDLEFISH_CUSTOMSTYLE
+}
+apply (area:CONST_GAUNTLET_AREA && name:"Paddlefish") {
+    VAR_GAUNTLET_PADDLEFISH_CUSTOMSTYLE
+}
+apply (area:CONST_GAUNTLET_AREA && name:"Crystal paddlefish" || name:"Corrupted paddlefish") {
+     VAR_GAUNTLET_CRYSTAL_PADDLEFISH_CUSTOMSTYLE
+}
+apply (area:CONST_GAUNTLET_AREA && name:"Weapon frame") {
+     VAR_GAUNTLET_WEAPON_FRAME_CUSTOMSTYLE
+}
+apply (area:CONST_GAUNTLET_AREA && name:"* spike") {
+    VAR_GAUNTLET_CRYSTAL_SPIKE_CUSTOMSTYLE
+}
+apply (area:CONST_GAUNTLET_AREA && name:"* orb") {
+    VAR_GAUNTLET_CRYSTAL_ORB_CUSTOMSTYLE
+}
+apply (area:CONST_GAUNTLET_AREA && name:"* bowstring") {
+    VAR_GAUNTLET_CRYSTALLINE_BOWSTRING_CUSTOMSTYLE
+}
+apply (area:CONST_GAUNTLET_AREA && name:"* halberd *") {
+    VAR_GAUNTLET_CRYSTAL_HALBERD_CUSTOMSTYLE
+}
+apply (area:CONST_GAUNTLET_AREA && name:"* bow *") {
+    VAR_GAUNTLET_CRYSTAL_BOW_CUSTOMSTYLE
+}
+apply (area:CONST_GAUNTLET_AREA && name:"* staff *") {
+    VAR_GAUNTLET_CRYSTAL_STAFF_CUSTOMSTYLE
+}
+apply (area:CONST_GAUNTLET_AREA && name:"Linum tirinum*") {
+    VAR_GAUNTLET_LINUM_TIRINUM_CUSTOMSTYLE
+}
+apply (area:CONST_GAUNTLET_AREA && name:"Phren bark*") {
+    VAR_GAUNTLET_PHREN_BARK_CUSTOMSTYLE
+}
+apply (area:CONST_GAUNTLET_AREA && name:"* ore") {
+    VAR_GAUNTLET_CRYSTAL_ORE_CUSTOMSTYLE
+}
+apply (area:CONST_GAUNTLET_AREA && name:"* helm *") {
+    VAR_GAUNTLET_CRYSTAL_HELM_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:"* body *") {
+    VAR_GAUNTLET_CRYSTAL_BODY_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:"* legs *") {
+    VAR_GAUNTLET_CRYSTAL_LEGS_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:["* (basic)", ]) {
+    VAR_GAUNTLET_BASIC_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:["* (attuned)", ]) {
+    VAR_GAUNTLET_ATTUNED_CUSTOMSTYLE 
+}
+apply (area:CONST_GAUNTLET_AREA && name:["* (perfected)", ]) {
+    VAR_GAUNTLET_PERFECTED_CUSTOMSTYLE 
+}
+
+
+
+
+
+/*@ define:module:rare_drop_table
+---
+name: Rare drop table
+subtitle: Give RDT some special attention
+description: |
+  Give RDT drops unique styling. This gives RDT drops a gold border by default. RDT drops are recognized by item name and quantity dropped. There will be some overlap with other drop tables.
+*/
+
+/*@ define:input:rare_drop_table
+type: enumlist
+label: Drops to force hidden
+enum: [
+  "Nature rune",
+  "Adamant javelin",
+  "Death rune",
+  "Law rune",
+  "Rune arrow",
+  "Steel arrow",
+  "Rune 2h sword",
+  "Rune battleaxe",
+  "Rune sq shield",
+  "Dragon med helm",
+  "Rune kiteshield",
+  "Coins",
+  "Loop half of key",
+  "Tooth half of key",
+  "Runite bar",
+  "Dragonstone",
+  "Silver ore",
+  "Uncut sapphire",
+  "Uncut emerald",
+  "Uncut ruby",
+  "Chaos talisman",
+  "Nature talisman",
+  "Uncut diamond",
+  "Rune javelin",
+  "Rune spear",
+  "Shield left half",
+  "Dragon spear"
+]
+*/
+#define VAR_RDT_HIDE []
+
+/*@ define:input:rare_drop_table
+type: enumlist
+label: Drops to show
+enum: [
+  "Nature rune",
+  "Adamant javelin",
+  "Death rune",
+  "Law rune",
+  "Rune arrow",
+  "Steel arrow",
+  "Rune 2h sword",
+  "Rune battleaxe",
+  "Rune sq shield",
+  "Dragon med helm",
+  "Rune kiteshield",
+  "Coins",
+  "Loop half of key",
+  "Tooth half of key",
+  "Runite bar",
+  "Dragonstone",
+  "Silver ore",
+  "Uncut sapphire",
+  "Uncut emerald",
+  "Uncut ruby",
+  "Chaos talisman",
+  "Nature talisman",
+  "Uncut diamond",
+  "Rune javelin",
+  "Rune spear",
+  "Shield left half",
+  "Dragon spear"
+]
+*/
+#define VAR_RDT_SHOW ["Loop half of key","Tooth half of key","Rune spear","Shield left half","Dragon spear","Dragonstone"]
+
+
+/*@ define:input:rare_drop_table
+type: style
+label: RDT custom style
+exampleItem: Dragon spear
+*/
+#define VAR_RDT_CUSTOMSTYLE textColor = "#ffffffff";backgroundColor = "#00000000";borderColor = "#00dea71b";lootbeamColor = "#ffffffff";fontType = 3;showLootbeam = true;
+
+
+apply (name:"Nature rune" && quantity:==67) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Nature rune" && quantity:==67 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Nature rune" && quantity:==67 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Adamant javelin" && quantity:==20) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Adamant javelin" && quantity:==20 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Adamant javelin" && quantity:==20 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Death rune" && quantity:==45) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Death rune" && quantity:==45 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Death rune" && quantity:==45 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Law rune" && quantity:==45) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Law rune" && quantity:==45 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Law rune" && quantity:==45 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Rune arrow" && quantity:==42) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Rune arrow" && quantity:==42 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Rune arrow" && quantity:==42 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Steel arrow" && quantity:==150) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Steel arrow" && quantity:==150 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Steel arrow" && quantity:==150 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Rune 2h sword" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Rune 2h sword" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Rune 2h sword" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Rune battleaxe" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Rune battleaxe" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Rune battleaxe" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Rune sq shield" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Rune sq shield" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Rune sq shield" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Dragon med helm" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Dragon med helm" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Dragon med helm" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Rune kiteshield" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Rune kiteshield" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Rune kiteshield" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Coins" && quantity:==3000) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Coins" && quantity:==3000 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Coins" && quantity:==3000 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Loop half of key" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Loop half of key" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Loop half of key" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Tooth half of key" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Tooth half of key" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Tooth half of key" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Runite bar" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Runite bar" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Runite bar" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Dragonstone" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Dragonstone" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Dragonstone" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Silver ore" && quantity:==100) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Silver ore" && quantity:==100 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Silver ore" && quantity:==100 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Uncut sapphire" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Uncut sapphire" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Uncut sapphire" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Uncut emerald" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Uncut emerald" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Uncut emerald" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Uncut ruby" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Uncut ruby" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Uncut ruby" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Chaos talisman" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Chaos talisman" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Chaos talisman" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Nature talisman" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Nature talisman" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Nature talisman" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Uncut diamond" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Uncut diamond" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Uncut diamond" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Rune javelin" && quantity:==5) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Rune javelin" && quantity:==5 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Rune javelin" && quantity:==5 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Loop half of key" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Loop half of key" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Loop half of key" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Tooth half of key" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Tooth half of key" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Tooth half of key" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Rune spear" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Rune spear" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Rune spear" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Shield left half" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Shield left half" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Shield left half" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+apply (name:"Dragon spear" && quantity:==1) {
+    VAR_RDT_CUSTOMSTYLE 
+}
+apply (name:"Dragon spear" && quantity:==1 && name:VAR_RDT_SHOW) {
+    hidden=false;
+}
+apply (name:"Dragon spear" && quantity:==1 && name:VAR_RDT_HIDE) {
+    hidden=true;
+}
+
+
+/*@ define:module:final
+hidden: true
+name: final
+*/
+
+/* --- hiding and showing specific items --- */
+
+apply (name:VAR_GLOBAL_HIDE) {
+    hidden = true;
+}
+apply (name:VAR_GLOBAL_SHOW) {
+    hidden = false;
+}
+
+/* --- sorting menu by value --- */
+
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=0 && value:<10) {
+    menuSort = 0;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=10 && value:<20) {
+    menuSort = 1;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=20 && value:<30) {
+    menuSort = 2;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=30 && value:<40) {
+    menuSort = 3;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=40 && value:<50) {
+    menuSort = 4;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=50 && value:<60) {
+    menuSort = 5;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=60 && value:<70) {
+    menuSort = 6;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=70 && value:<80) {
+    menuSort = 7;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=80 && value:<90) {
+    menuSort = 8;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=90 && value:<100) {
+    menuSort = 9;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=100 && value:<200) {
+    menuSort = 10;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=200 && value:<300) {
+    menuSort = 11;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=300 && value:<400) {
+    menuSort = 12;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=400 && value:<500) {
+    menuSort = 13;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=500 && value:<600) {
+    menuSort = 14;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=600 && value:<700) {
+    menuSort = 15;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=700 && value:<800) {
+    menuSort = 16;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=800 && value:<900) {
+    menuSort = 17;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=900 && value:<1000) {
+    menuSort = 18;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=1000 && value:<2000) {
+    menuSort = 19;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=2000 && value:<3000) {
+    menuSort = 20;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=3000 && value:<4000) {
+    menuSort = 21;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=4000 && value:<5000) {
+    menuSort = 22;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=5000 && value:<6000) {
+    menuSort = 23;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=6000 && value:<7000) {
+    menuSort = 24;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=7000 && value:<8000) {
+    menuSort = 25;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=8000 && value:<9000) {
+    menuSort = 26;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=9000 && value:<10000) {
+    menuSort = 27;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=10000 && value:<20000) {
+    menuSort = 28;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=20000 && value:<30000) {
+    menuSort = 29;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=30000 && value:<40000) {
+    menuSort = 30;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=40000 && value:<50000) {
+    menuSort = 31;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=50000 && value:<60000) {
+    menuSort = 32;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=60000 && value:<70000) {
+    menuSort = 33;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=70000 && value:<80000) {
+    menuSort = 34;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=80000 && value:<90000) {
+    menuSort = 35;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=90000 && value:<100000) {
+    menuSort = 36;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=100000 && value:<200000) {
+    menuSort = 37;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=200000 && value:<300000) {
+    menuSort = 38;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=300000 && value:<400000) {
+    menuSort = 39;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=400000 && value:<500000) {
+    menuSort = 40;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=500000 && value:<600000) {
+    menuSort = 41;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=600000 && value:<700000) {
+    menuSort = 42;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=700000 && value:<800000) {
+    menuSort = 43;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=800000 && value:<900000) {
+    menuSort = 44;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=900000 && value:<1000000) {
+    menuSort = 45;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=1000000 && value:<2000000) {
+    menuSort = 46;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=2000000 && value:<3000000) {
+    menuSort = 47;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=3000000 && value:<4000000) {
+    menuSort = 48;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=4000000 && value:<5000000) {
+    menuSort = 49;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=5000000 && value:<6000000) {
+    menuSort = 50;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=6000000 && value:<7000000) {
+    menuSort = 51;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=7000000 && value:<8000000) {
+    menuSort = 52;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=8000000 && value:<9000000) {
+    menuSort = 53;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=9000000 && value:<10000000) {
+    menuSort = 54;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=10000000 && value:<20000000) {
+    menuSort = 55;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=20000000 && value:<30000000) {
+    menuSort = 56;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=30000000 && value:<40000000) {
+    menuSort = 57;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=40000000 && value:<50000000) {
+    menuSort = 58;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=50000000 && value:<60000000) {
+    menuSort = 59;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=60000000 && value:<70000000) {
+    menuSort = 60;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=70000000 && value:<80000000) {
+    menuSort = 61;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=80000000 && value:<90000000) {
+    menuSort = 62;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=90000000 && value:<100000000) {
+    menuSort = 63;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=100000000 && value:<200000000) {
+    menuSort = 64;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=200000000 && value:<300000000) {
+    menuSort = 65;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=300000000 && value:<400000000) {
+    menuSort = 66;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=400000000 && value:<500000000) {
+    menuSort = 67;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=500000000 && value:<600000000) {
+    menuSort = 68;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=600000000 && value:<700000000) {
+    menuSort = 69;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=700000000 && value:<800000000) {
+    menuSort = 70;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=800000000 && value:<900000000) {
+    menuSort = 71;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=900000000 && value:<1000000000) {
+    menuSort = 72;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=1000000000 && value:<1100000000) {
+    menuSort = 73;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=1100000000 && value:<1200000000) {
+    menuSort = 74;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=1200000000 && value:<1300000000) {
+    menuSort = 75;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=1300000000 && value:<1400000000) {
+    menuSort = 76;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=1400000000 && value:<1500000000) {
+    menuSort = 77;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=1500000000 && value:<1600000000) {
+    menuSort = 78;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=1600000000 && value:<1700000000) {
+    menuSort = 79;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=1700000000 && value:<1800000000) {
+    menuSort = 80;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=1800000000 && value:<1900000000) {
+    menuSort = 81;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=1900000000 && value:<2000000000) {
+    menuSort = 82;
+}
+apply ((VAR_SORTING_MENU_SORT_BY_VALUE || VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST) && value:>=2000000000) {
+    menuSort = 83;
+}
+
+/* --- sorting menu by value with stackables first --- */
+
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=0 && value:<10) {
+    menuSort = 84;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=10 && value:<20) {
+    menuSort = 85;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=20 && value:<30) {
+    menuSort = 86;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=30 && value:<40) {
+    menuSort = 87;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=40 && value:<50) {
+    menuSort = 88;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=50 && value:<60) {
+    menuSort = 89;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=60 && value:<70) {
+    menuSort = 90;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=70 && value:<80) {
+    menuSort = 91;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=80 && value:<90) {
+    menuSort = 92;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=90 && value:<100) {
+    menuSort = 93;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=100 && value:<200) {
+    menuSort = 94;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=200 && value:<300) {
+    menuSort = 95;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=300 && value:<400) {
+    menuSort = 96;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=400 && value:<500) {
+    menuSort = 97;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=500 && value:<600) {
+    menuSort = 98;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=600 && value:<700) {
+    menuSort = 99;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=700 && value:<800) {
+    menuSort = 100;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=800 && value:<900) {
+    menuSort = 101;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=900 && value:<1000) {
+    menuSort = 102;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=1000 && value:<2000) {
+    menuSort = 103;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=2000 && value:<3000) {
+    menuSort = 104;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=3000 && value:<4000) {
+    menuSort = 105;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=4000 && value:<5000) {
+    menuSort = 106;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=5000 && value:<6000) {
+    menuSort = 107;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=6000 && value:<7000) {
+    menuSort = 108;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=7000 && value:<8000) {
+    menuSort = 109;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=8000 && value:<9000) {
+    menuSort = 110;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=9000 && value:<10000) {
+    menuSort = 111;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=10000 && value:<20000) {
+    menuSort = 112;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=20000 && value:<30000) {
+    menuSort = 113;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=30000 && value:<40000) {
+    menuSort = 114;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=40000 && value:<50000) {
+    menuSort = 115;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=50000 && value:<60000) {
+    menuSort = 116;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=60000 && value:<70000) {
+    menuSort = 117;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=70000 && value:<80000) {
+    menuSort = 118;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=80000 && value:<90000) {
+    menuSort = 119;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=90000 && value:<100000) {
+    menuSort = 120;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=100000 && value:<200000) {
+    menuSort = 121;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=200000 && value:<300000) {
+    menuSort = 122;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=300000 && value:<400000) {
+    menuSort = 123;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=400000 && value:<500000) {
+    menuSort = 124;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=500000 && value:<600000) {
+    menuSort = 125;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=600000 && value:<700000) {
+    menuSort = 126;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=700000 && value:<800000) {
+    menuSort = 127;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=800000 && value:<900000) {
+    menuSort = 128;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=900000 && value:<1000000) {
+    menuSort = 129;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=1000000 && value:<2000000) {
+    menuSort = 130;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=2000000 && value:<3000000) {
+    menuSort = 131;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=3000000 && value:<4000000) {
+    menuSort = 132;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=4000000 && value:<5000000) {
+    menuSort = 133;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=5000000 && value:<6000000) {
+    menuSort = 134;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=6000000 && value:<7000000) {
+    menuSort = 135;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=7000000 && value:<8000000) {
+    menuSort = 136;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=8000000 && value:<9000000) {
+    menuSort = 137;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=9000000 && value:<10000000) {
+    menuSort = 138;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=10000000 && value:<20000000) {
+    menuSort = 139;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=20000000 && value:<30000000) {
+    menuSort = 140;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=30000000 && value:<40000000) {
+    menuSort = 141;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=40000000 && value:<50000000) {
+    menuSort = 142;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=50000000 && value:<60000000) {
+    menuSort = 143;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=60000000 && value:<70000000) {
+    menuSort = 144;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=70000000 && value:<80000000) {
+    menuSort = 145;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=80000000 && value:<90000000) {
+    menuSort = 146;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=90000000 && value:<100000000) {
+    menuSort = 147;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=100000000 && value:<200000000) {
+    menuSort = 148;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=200000000 && value:<300000000) {
+    menuSort = 149;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=300000000 && value:<400000000) {
+    menuSort = 150;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=400000000 && value:<500000000) {
+    menuSort = 151;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=500000000 && value:<600000000) {
+    menuSort = 152;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=600000000 && value:<700000000) {
+    menuSort = 153;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=700000000 && value:<800000000) {
+    menuSort = 154;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=800000000 && value:<900000000) {
+    menuSort = 155;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=900000000 && value:<1000000000) {
+    menuSort = 156;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=1000000000 && value:<1100000000) {
+    menuSort = 157;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=1100000000 && value:<1200000000) {
+    menuSort = 158;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=1200000000 && value:<1300000000) {
+    menuSort = 159;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=1300000000 && value:<1400000000) {
+    menuSort = 160;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=1400000000 && value:<1500000000) {
+    menuSort = 161;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=1500000000 && value:<1600000000) {
+    menuSort = 162;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=1600000000 && value:<1700000000) {
+    menuSort = 163;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=1700000000 && value:<1800000000) {
+    menuSort = 164;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=1800000000 && value:<1900000000) {
+    menuSort = 165;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=1900000000 && value:<2000000000) {
+    menuSort = 166;
+}
+apply (VAR_SORTING_MENU_SORT_BY_VALUE_STACKABLES_FIRST && (stackable:true || noted:true) && value:>=2000000000) {
+    menuSort = 167;
+}
+
+/* --- handling menu sort for untradeables --- */
+
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=0 && value:<10) {
+    menuSort = 201;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=10 && value:<20) {
+    menuSort = 202;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=20 && value:<30) {
+    menuSort = 203;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=30 && value:<40) {
+    menuSort = 204;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=40 && value:<50) {
+    menuSort = 205;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=50 && value:<60) {
+    menuSort = 206;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=60 && value:<70) {
+    menuSort = 207;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=70 && value:<80) {
+    menuSort = 208;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=80 && value:<90) {
+    menuSort = 209;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=90 && value:<100) {
+    menuSort = 210;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=100 && value:<200) {
+    menuSort = 211;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=200 && value:<300) {
+    menuSort = 212;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=300 && value:<400) {
+    menuSort = 213;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=400 && value:<500) {
+    menuSort = 214;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=500 && value:<600) {
+    menuSort = 215;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=600 && value:<700) {
+    menuSort = 216;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=700 && value:<800) {
+    menuSort = 217;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=800 && value:<900) {
+    menuSort = 218;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=900 && value:<1000) {
+    menuSort = 219;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=1000 && value:<2000) {
+    menuSort = 220;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=2000 && value:<3000) {
+    menuSort = 221;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=3000 && value:<4000) {
+    menuSort = 222;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=4000 && value:<5000) {
+    menuSort = 223;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=5000 && value:<6000) {
+    menuSort = 224;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=6000 && value:<7000) {
+    menuSort = 225;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=7000 && value:<8000) {
+    menuSort = 226;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=8000 && value:<9000) {
+    menuSort = 227;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=9000 && value:<10000) {
+    menuSort = 228;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=10000 && value:<20000) {
+    menuSort = 229;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=20000 && value:<30000) {
+    menuSort = 230;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=30000 && value:<40000) {
+    menuSort = 231;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=40000 && value:<50000) {
+    menuSort = 232;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=50000 && value:<60000) {
+    menuSort = 233;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=60000 && value:<70000) {
+    menuSort = 234;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=70000 && value:<80000) {
+    menuSort = 235;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=80000 && value:<90000) {
+    menuSort = 236;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=90000 && value:<100000) {
+    menuSort = 237;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=100000 && value:<200000) {
+    menuSort = 238;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=200000 && value:<300000) {
+    menuSort = 239;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=300000 && value:<400000) {
+    menuSort = 240;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=400000 && value:<500000) {
+    menuSort = 241;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=500000 && value:<600000) {
+    menuSort = 242;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=600000 && value:<700000) {
+    menuSort = 243;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=700000 && value:<800000) {
+    menuSort = 244;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=800000 && value:<900000) {
+    menuSort = 245;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=900000 && value:<1000000) {
+    menuSort = 246;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=1000000 && value:<2000000) {
+    menuSort = 247;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=2000000 && value:<3000000) {
+    menuSort = 248;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=3000000 && value:<4000000) {
+    menuSort = 249;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=4000000 && value:<5000000) {
+    menuSort = 250;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=5000000 && value:<6000000) {
+    menuSort = 251;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=6000000 && value:<7000000) {
+    menuSort = 252;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=7000000 && value:<8000000) {
+    menuSort = 253;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=8000000 && value:<9000000) {
+    menuSort = 254;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=9000000 && value:<10000000) {
+    menuSort = 255;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=10000000 && value:<20000000) {
+    menuSort = 256;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=20000000 && value:<30000000) {
+    menuSort = 257;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=30000000 && value:<40000000) {
+    menuSort = 258;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=40000000 && value:<50000000) {
+    menuSort = 259;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=50000000 && value:<60000000) {
+    menuSort = 260;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=60000000 && value:<70000000) {
+    menuSort = 261;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=70000000 && value:<80000000) {
+    menuSort = 262;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=80000000 && value:<90000000) {
+    menuSort = 263;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=90000000 && value:<100000000) {
+    menuSort = 264;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=100000000 && value:<200000000) {
+    menuSort = 265;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=200000000 && value:<300000000) {
+    menuSort = 266;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=300000000 && value:<400000000) {
+    menuSort = 267;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=400000000 && value:<500000000) {
+    menuSort = 268;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=500000000 && value:<600000000) {
+    menuSort = 269;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=600000000 && value:<700000000) {
+    menuSort = 270;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=700000000 && value:<800000000) {
+    menuSort = 271;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=800000000 && value:<900000000) {
+    menuSort = 272;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=900000000 && value:<1000000000) {
+    menuSort = 273;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=1000000000 && value:<1100000000) {
+    menuSort = 274;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=1100000000 && value:<1200000000) {
+    menuSort = 275;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=1200000000 && value:<1300000000) {
+    menuSort = 276;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=1300000000 && value:<1400000000) {
+    menuSort = 277;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=1400000000 && value:<1500000000) {
+    menuSort = 278;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=1500000000 && value:<1600000000) {
+    menuSort = 279;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=1600000000 && value:<1700000000) {
+    menuSort = 280;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=1700000000 && value:<1800000000) {
+    menuSort = 281;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=1800000000 && value:<1900000000) {
+    menuSort = 282;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=1900000000 && value:<2000000000) {
+    menuSort = 283;
+}
+apply (VAR_SORTING_MENU_SORT_UNTRADEABLE_FIRST && tradeable:false && value:>=2000000000) {
+    menuSort = 284;
+}
+
+/* --- putting certain items first in the menu sorting --- */
+
+apply (name:VAR_MENU_SORT_ITEMS_FIRST) {
+    menuSort = 300;
+}
+
+/*@ define:module:constants
+hidden: true
+name: Constants
+*/
+
+#define CONST_GLOBAL_TRADEABLE_NON_TRADEABLE_ITEMS [     "1/2 anchovy pizza",     "1/2 meat pizza",     "1/2 pineapple pizza",     "1/2 plain pizza",     "2/3 cake",     "2/3 chocolate cake",     "Adamant fire arrow",     "Air rune pack",     "Amethyst fire arrow",     "An empty box",     "Anchovy paste",     "Apples(1)",     "Apples(2)",     "Apples(3)",     "Apples(4)",     "Astronomy book",     "Bailing bucket",     "Bananas(1)",     "Bananas(2)",     "Bananas(3)",     "Bananas(4)",     "Bandages",     "Barricade",     "Basket pack",     "Black mask (1)",     "Black mask (10)",     "Black mask (2)",     "Black mask (3)",     "Black mask (4)",     "Black mask (5)",     "Black mask (6)",     "Black mask (7)",     "Black mask (8)",     "Black mask (9)",     "Black satchel",     "Blue flowers",     "Broken pole",     "Bronze fire arrow",     "Bruised banana",     "Bucket of rubble",     "Burnt anglerfish",     "Burnt bat",     "Burnt batta",     "Burnt beast meat",     "Burnt bird meat",     "Burnt bread",     "Burnt cake",     "Burnt cave eel",     "Burnt chicken",     "Burnt crunchies",     "Burnt curry",     "Burnt dark crab",     "Burnt eel",     "Burnt egg",     "Burnt fish",     "Burnt fish",     "Burnt fish",     "Burnt fish",     "Burnt fish",     "Burnt fish",     "Burnt gnomebowl",     "Burnt jubbly",     "Burnt karambwan",     "Burnt lobster",     "Burnt manta ray",     "Burnt meat",     "Burnt monkfish",     "Burnt mushroom",     "Burnt onion",     "Burnt oomlie",     "Burnt oomlie wrap",     "Burnt pie",     "Burnt pizza",     "Burnt potato",     "Burnt rabbit",     "Burnt rainbow fish",     "Burnt sea turtle",     "Burnt shark",     "Burnt shrimp",     "Burnt snail",     "Burnt spider (stick)",     "Burnt stew",     "Burnt sweetcorn",     "Burnt swordfish",     "Cadarn lineage",     "Cat training medal",     "Chaos rune pack",     "Chaotic handegg",     "Chocolate slice",     "Climbing rope",     "Coconut shell",     "Coins",     "Cooked chicken",     "Cooked meat",     "Crate",     "Crushed gem",     "Crystal singing for beginners",     "Damp egg",     "Damp tinderbox",     "Dragon fire arrow",     "Earth rune pack",     "Empty oyster",     "Explosive potion",     "Feather pack",     "Field ration",     "Fire rune pack",     "Flyer",     "Fossilised Dung",     "Glassblowing book",     "Gold satchel",     "Green satchel",     "Ground bat bones",     "Guthix balance (unf)",     "Half a admiral pie",     "Half a apple pie",     "Half a botanical pie",     "Half a dragonfruit pie",     "Half a fish pie",     "Half a garden pie",     "Half a meat pie",     "Half a mud pie",     "Half a mushroom pie",     "Half a redberry pie",     "Half a summer pie",     "Half a wild pie",     "Half certificate (left)",     "Half certificate (right)",     "Half coconut",     "Holy handegg",     "Incomplete pizza",     "Iron fire arrow",     "Iron sickle",     "Mind rune pack",     "Miscellaneous key",     "Mithril fire arrow",     "Mud",     "Muddy rock",     "Newcomer map",     "Newspaper",     "Old wool",     "Oranges(1)",     "Oranges(2)",     "Oranges(3)",     "Oranges(4)",     "Part admiral pie",     "Part fish pie",     "Part garden pie",     "Part mud pie",     "Part summer pie",     "Part wild pie",     "Peaceful handegg",     "Pete's candlestick",     "Phoenix crossbow",     "Plain satchel",     "Plant pot pack",     "Platinum token",     "Potion",     "Raw beef",     "Raw chicken",     "Raw swamp paste",     "Red flowers",     "Red satchel",     "Rock",     "Rock",     "Rotten food",     "Rotten tomato",     "Ruined chompy",     "Ruined herb tea",     "Rune fire arrow",     "Rune satchel",     "Sack pack",     "Sample bottle",     "Shayzien supply crate",     "Slice of cake",     "Smashed glass",     "Smelly sock",     "Spare controls",     "Spider on shaft",     "Spooky egg",     "Steel fire arrow",     "Strawberries(1)",     "Strawberries(2)",     "Strawberries(3)",     "Strawberries(4)",     "Strip of cloth",     "Sulphur",     "Tankard",     "Tea leaves",     "Tile",     "Tomatoes(1)",     "Tomatoes(2)",     "Tomatoes(3)",     "Tomatoes(4)",     "Toolkit",     "Tzhaar air rune pack",     "Tzhaar earth rune pack",     "Tzhaar fire rune pack",     "Tzhaar water rune pack",     "Ugthanki kebab",     "Uncooked pizza",     "Unfinished broad bolt pack",     "Washing bowl",     "Water rune pack",     "Water-filled vial pack",     "Weapon store key", ]
+
+
+#define CONST_FARMING_SEEDS_ALLOTMENT_LIST [   "Potato seed",   "Onion seed",   "Cabbage seed",   "Tomato seed",   "Sweetcorn seed",   "Strawberry seed",   "Watermelon seed",   "Snape grass seed", ]
+
+#define CONST_FARMING_SEEDS_FLOWER_LIST [   "Marigold seed",   "Rosemary seed",   "Nasturtium seed",   "Woad seed",   "Limpwurt seed",   "White lily seed", ]
+
+#define CONST_FARMING_SEEDS_HERB_LIST [   "Guam seed",   "Marrentill seed",   "Tarromin seed",   "Harralander seed",   "Ranarr seed",   "Toadflax seed",   "Irit seed",   "Avantoe seed",   "Kwuarm seed",   "Snapdragon seed",   "Huasca seed",   "Cadantine seed",   "Lantadyme seed",   "Dwarf weed seed",   "Torstol seed", ]
+
+#define CONST_FARMING_SEEDS_HOPS_LIST [   "Barley seed",   "Hammerstone seed",   "Asgarnian seed",   "Jute seed",   "Yanillian seed",   "Krandorian seed",   "Wildblood seed", ]
+
+#define CONST_FARMING_SEEDS_BUSH_LIST [   "Redberry seed",   "Cadavaberry seed",   "Dwellberry seed",   "Jangerberry seed",   "Whiteberry seed",   "Poison ivy seed", ]
+
+#define CONST_FARMING_SEEDS_TREE_LIST [   "Acorn",   "Willow seed",   "Maple seed",   "Yew seed",   "Magic seed", ]
+
+#define CONST_FARMING_SEEDS_FRUIT_TREE_LIST [   "Apple seed",   "Banana seed",   "Orange seed",   "Curry seed",   "Pineapple seed",   "Papaya seed",   "Palm tree seed",   "Dragonfruit seed", ]
+
+#define CONST_FARMING_SEEDS_SPECIAL_TREE_LIST [   "Teak seed",   "Mahogany seed",   "Calquat tree seed",   "Crystal acorn",   "Spirit seed",   "Celastrus seed",   "Redwood tree seed", ]
+
+#define CONST_FARMING_SEEDS_SPECIAL_LIST [   "Seaweed spore",   "Grape seed",   "Mushroom spore",   "Belladonna seed",   "Hespori seed",   "Cactus seed",   "Potato cactus seed", ]
+
+#define CONST_FARMING_SEEDS_ANIMA_LIST [   "Kronos seed",   "Iasor seed",   "Attas seed", ]
