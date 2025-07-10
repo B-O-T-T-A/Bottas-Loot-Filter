@@ -4465,9 +4465,6 @@ apply (area:CONST_TOA_AREA && name:VAR_TOA_ROOM_ITEMS_HIDE) {
 apply (area:CONST_TOA_AREA && name:VAR_TOA_ROOM_ITEMS_SHOW) {
     hidden = false;
 }
-apply (area:CONST_TOA_AREA && name:VAR_TOA_MVP_ITEMS_HIDE) {
-    hidden = true;
-}
 apply (area:CONST_TOA_AREA && name:VAR_TOA_MVP_ITEMS_SHOW) {
     hidden = false;
 }
