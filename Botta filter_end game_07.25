@@ -4420,18 +4420,6 @@ enum: [
 */
 #define VAR_TOA_MVP_ITEMS_SHOW ["Big banana","Eldritch ashes","Fang","Scarab dung"]
 
-/*@ define:input:area_based_filtering
-type: enumlist
-label: MVP items to force hidden
-group: Tombs of Amascut
-enum: [
-  "Big banana",
-  "Eldritch ashes",
-  "Fang",
-  "Scarab dung"
-]
-*/
-#define VAR_TOA_MVP_ITEMS_HIDE []
 
 /*@ define:input:area_based_filtering
 type: enumlist
