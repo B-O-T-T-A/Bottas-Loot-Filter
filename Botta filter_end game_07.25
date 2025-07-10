@@ -4301,30 +4301,6 @@ apply (area:CONST_COX_AREA && name:VAR_COX_SEEDS_HIDE) {
 apply (area:CONST_COX_AREA && name:VAR_COX_MISC_DROPS_HIDE) {
     hidden = true;
 }
-apply (area:CONST_COX_AREA && name:["elder (-)*",    ] && name:VAR_COX_POTIONS_HIDE) {
-    hidden = true;
-}
-apply (area:CONST_COX_AREA && name:["twisted (-)*", ] && name:VAR_COX_POTIONS_HIDE) {
-    hidden = true;
-}
-apply (area:CONST_COX_AREA && name:["kodai (-)*",    ] && name:VAR_COX_POTIONS_HIDE) {
-    hidden = true;
-}
-apply (area:CONST_COX_AREA && name:["revitalisation (-)*",  ] && name:VAR_COX_POTIONS_HIDE) {
-    hidden = true;
-}
-apply (area:CONST_COX_AREA && name:["prayer enhance (-)*",, ] && name:VAR_COX_POTIONS_HIDE) {
-    hidden = true;
-}
-apply (area:CONST_COX_AREA && name:["xeric's aid (-)*", ] && name:VAR_COX_POTIONS_HIDE) {
-    hidden = true;
-}
-apply (area:CONST_COX_AREA && name:["antipoison (-)*",   "antipoison (4)",   "antipoison (3)",   "antipoison (2)",   "antipoison (1)",   "antipoison (+)*", ] && name:VAR_COX_POTIONS_HIDE) {
-    hidden = true;
-}
-apply (area:CONST_COX_AREA && name:["overload (-)*",    ] && name:VAR_COX_POTIONS_HIDE) {
-    hidden = true;
-}
 
 
 /*@ define:input:area_based_filtering
