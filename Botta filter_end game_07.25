@@ -6825,7 +6825,7 @@ label: Eldritch ashes
 group: Tombs of Amascut Styles
 backgroundImage: Wardens
 */
-#define VAR_ELDRITCH_ASHES_CUSTOMSTYLE textColor = "#ffff00b0";backgroundColor = "#00cccc49";borderColor = "#00cccc49";textAccentColor = "#FF000000";lootbeamColor = "#ffff00b0";menuTextColor = "#ffdb8400";fontType = 3;showLootbeam = true;sound = 0;icon = Item(12397);
+#define VAR_ELDRITCH_ASHES_CUSTOMSTYLE textColor = "#ffff00b0";backgroundColor = "#00cccc49";borderColor = "#00cccc49";textAccentColor = "#FF000000";lootbeamColor = "#ffff00b0";menuTextColor = "#ffdb8400";fontType = 3;showLootbeam = true;icon = Item(12397);
 
 apply (name:"Eldritch ashes") {
     VAR_ELDRITCH_ASHES_CUSTOMSTYLE
