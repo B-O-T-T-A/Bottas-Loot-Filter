@@ -128,6 +128,19 @@ apply (name:VAR_GLOBAL_SHOW_ICONS_ITEMLIST) {
     icon = CurrentItem();
 }
 
+/*@ define:input:filtering
+type: style
+label: Trophy Valuables
+group: Trophy Items
+exampleItem: Purifying sigil
+*/
+
+#define VAR_TROPHY_VALUABLES_CUSTOMSTYLE textColor = "#ff00c2"; backgroundColor = "#0033c7cc"; borderColor = "#0033c7cc"; textAccentColor = "#FF000000"; lootbeamColor = "#ff00c2"; menuTextColor = "#ffff9900"; fontType = 3; showLootbeam = true; showValue = false; showDespawn = false; notify = false;
+
+apply (name:["Purifying sigil (middle)", "Purifying sigil (right)", "Purifying sigil (top)", "Purifying sigil (bottom)", "Purifying sigil (left)", "Purifying sigil", "Dark totem", "Dark totem top", "Dark totem middle", "Dark totem base"]) {
+    VAR_TROPHY_VALUABLES_CUSTOMSTYLE
+}
+
 
 /*@ define:module:sorting
 ---
