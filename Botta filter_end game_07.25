@@ -242,7 +242,7 @@ type: boolean
 label: Hide world spawns
 group: Ownership
 */
-#define VAR_GLOBAL_HIDE_SPAWN_ITEMS true
+#define VAR_GLOBAL_HIDE_SPAWN_ITEMS false
 
 /*@ define:input:filtering
 type: stringlist
