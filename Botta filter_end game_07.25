@@ -6276,6 +6276,18 @@ exampleItem: Clue scroll (easy)
 apply (name:"Clue scroll (easy)") {
     VAR_CLUE_SCROLLS_EASY_CUSTOMSTYLE 
 }
+apply (name:"Clue bottle (easy)") {
+    VAR_CLUE_SCROLLS_EASY_CUSTOMSTYLE 
+}
+apply (name:"Clue nest (easy)") {
+    VAR_CLUE_SCROLLS_EASY_CUSTOMSTYLE 
+}
+apply (name:"Clue geode (easy)") {
+    VAR_CLUE_SCROLLS_EASY_CUSTOMSTYLE 
+}
+apply (name:"Scroll box (easy)") {
+    VAR_CLUE_SCROLLS_EASY_CUSTOMSTYLE 
+}
 
 /*@ define:input:individual_item_styles
 type: style
@@ -6286,6 +6298,18 @@ exampleItem: Clue scroll (medium)
 #define VAR_CLUE_SCROLLS_MEDIUM_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#008f7f61";borderColor = "#006dbbbf";textAccentColor = "#ff007dff";lootbeamColor = "#ffffffff";menuTextColor = "#ff007dff";textAccent = 2;fontType = 3;showLootbeam = true;icon = CurrentItem();
 
 apply (name:"Clue scroll (medium)") {
+    VAR_CLUE_SCROLLS_MEDIUM_CUSTOMSTYLE 
+}
+apply (name:"Clue bottle (medium)") {
+    VAR_CLUE_SCROLLS_MEDIUM_CUSTOMSTYLE 
+}
+apply (name:"Clue nest (medium)") {
+    VAR_CLUE_SCROLLS_MEDIUM_CUSTOMSTYLE 
+}
+apply (name:"Clue geode (medium)") {
+    VAR_CLUE_SCROLLS_MEDIUM_CUSTOMSTYLE 
+}
+apply (name:"Scroll box (medium)") {
     VAR_CLUE_SCROLLS_MEDIUM_CUSTOMSTYLE 
 }
 
@@ -6300,6 +6324,18 @@ exampleItem: Clue scroll (hard)
 apply (name:"Clue scroll (hard)") {
     VAR_CLUE_SCROLLS_HARD_CUSTOMSTYLE 
 }
+apply (name:"Clue bottle (hard)") {
+    VAR_CLUE_SCROLLS_HARD_CUSTOMSTYLE 
+}
+apply (name:"Clue nest (hard)") {
+    VAR_CLUE_SCROLLS_HARD_CUSTOMSTYLE 
+}
+apply (name:"Clue geode (hard)") {
+    VAR_CLUE_SCROLLS_HARD_CUSTOMSTYLE 
+}
+apply (name:"Scroll box (hard)") {
+    VAR_CLUE_SCROLLS_HARD_CUSTOMSTYLE 
+}
 
 /*@ define:input:individual_item_styles
 type: style
@@ -6312,6 +6348,18 @@ exampleItem: Clue scroll (elite)
 apply (name:"Clue scroll (elite)") {
     VAR_CLUE_SCROLLS_ELITE_CUSTOMSTYLE 
 }
+apply (name:"Clue bottle (elite)") {
+    VAR_CLUE_SCROLLS_ELITE_CUSTOMSTYLE 
+}
+apply (name:"Clue nest (elite)") {
+    VAR_CLUE_SCROLLS_ELITE_CUSTOMSTYLE 
+}
+apply (name:"Clue geode (elite)") {
+    VAR_CLUE_SCROLLS_ELITE_CUSTOMSTYLE 
+}
+apply (name:"Scroll box (elite)") {
+    VAR_CLUE_SCROLLS_ELITE_CUSTOMSTYLE 
+}
 
 /*@ define:input:individual_item_styles
 type: style
@@ -6322,6 +6370,18 @@ exampleItem: Clue scroll (master)
 #define VAR_CLUE_SCROLLS_MASTER_CUSTOMSTYLE textColor = "#FFFFFFFF";backgroundColor = "#008f7f61";borderColor = "#00c23d30";textAccentColor = "#ffff1500";lootbeamColor = "#ffffffff";menuTextColor = "#ffff1500";textAccent = 2;fontType = 3;showLootbeam = true;icon = CurrentItem();
 
 apply (name:"Clue scroll (master)") {
+    VAR_CLUE_SCROLLS_MASTER_CUSTOMSTYLE 
+}
+apply (name:"Clue bottle (master)") {
+    VAR_CLUE_SCROLLS_MASTER_CUSTOMSTYLE 
+}
+apply (name:"Clue nest (master)") {
+    VAR_CLUE_SCROLLS_MASTER_CUSTOMSTYLE 
+}
+apply (name:"Clue geode (master)") {
+    VAR_CLUE_SCROLLS_MASTER_CUSTOMSTYLE 
+}
+apply (name:"Scroll box (master)") {
     VAR_CLUE_SCROLLS_MASTER_CUSTOMSTYLE 
 }
 
