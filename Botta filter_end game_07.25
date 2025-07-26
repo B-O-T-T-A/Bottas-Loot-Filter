@@ -148,10 +148,22 @@ group: Trophy Items
 */
 #define VAR_SHOW_NOTED_RED_SPIDERS_EGGS true
 
-apply (name:"Red spiders' eggs" && noted:true && VAR_SHOW_NOTED_RED_SPIDERS_EGGS) {
-    VAR_TROPHY_VALUABLES_CUSTOMSTYLE
+rule (name:"Red spiders' eggs" && noted:true && VAR_SHOW_NOTED_RED_SPIDERS_EGGS) {
+    textColor = "#fafaf7";
+    backgroundColor = "#0033c7cc";
+    borderColor = "#0033c7cc";
+    textAccentColor = "#ff00ea";
+    lootbeamColor = "#030002";
+    menuTextColor = "#ffff9900";
+    fontType = 3;
+    showLootbeam = true;
+    showValue = false;
+    showDespawn = false;
+    notify = false;
     icon = Item(223);
+    hidden = false;
 }
+
 
 /*@ define:module:sorting
 ---
@@ -185,7 +197,7 @@ label: Prioritize Untradeables
 type: stringlist
 label: Items to always show first
 */
-#define VAR_MENU_SORT_ITEMS_FIRST ["Coins"]
+#define VAR_MENU_SORT_ITEMS_FIRST ["Red spiders' eggs", "Coins"]
 
 
 /*@ define:module:filtering
