@@ -141,6 +141,17 @@ apply (name:["Purifying sigil (middle)", "Purifying sigil (right)", "Purifying s
     VAR_TROPHY_VALUABLES_CUSTOMSTYLE
 }
 
+/*@ define:input:filtering
+type: boolean
+label: Show noted Red spiders' eggs as Trophy
+group: Trophy Items
+*/
+#define VAR_SHOW_NOTED_RED_SPIDERS_EGGS true
+
+apply (name:"Red spiders' eggs" && noted:true && VAR_SHOW_NOTED_RED_SPIDERS_EGGS) {
+    VAR_TROPHY_VALUABLES_CUSTOMSTYLE
+    icon = Item(223);
+}
 
 /*@ define:module:sorting
 ---
