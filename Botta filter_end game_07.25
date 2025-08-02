@@ -128,6 +128,42 @@ apply (name:VAR_GLOBAL_SHOW_ICONS_ITEMLIST) {
     icon = CurrentItem();
 }
 
+/*@ define:input:filtering
+type: style
+label: Trophy Valuables
+group: Trophy Items
+exampleItem: Purifying sigil
+*/
+
+#define VAR_TROPHY_VALUABLES_CUSTOMSTYLE textColor = "#fafaf7"; backgroundColor = "#0033c7cc"; borderColor = "#0033c7cc"; textAccentColor = "#ff00ea"; lootbeamColor = "#030002"; menuTextColor = "#ffff9900"; fontType = 3; showLootbeam = true; showValue = false; showDespawn = false; notify = false;
+
+apply (name:["Purifying sigil (middle)", "Purifying sigil (right)", "Purifying sigil (top)", "Purifying sigil (bottom)", "Purifying sigil (left)", "Purifying sigil", "Dark totem", "Dark totem top", "Dark totem middle", "Dark totem base", "Brimstone key", "Brittle key", "Ecumenical key", "Giant key", "Mossy key", "Grubby key", "Larran's key", "Zombie pirate key", "Hydra's eye", "Hydra's fang", "Hydra's heart", "Jar of chemicals", "Jar of darkness", "Jar of decay", "Jar of dirt", "Jar of dreams", "Jar of eyes", "Jar of miasma", "Jar of sand", "Jar of smoke", "Jar of souls", "Jar of spirits", "Jar of stone", "Jar of swamp", "Jar of venom", "Remnant of Akkha", "Remnant of Ba-Ba", "Remnant of Kephri", "Remnant of Zebak", "Ancient remnant", "Masori crafting kit", "Menaphite ornament kit", "Cursed phalanx"]) {
+    VAR_TROPHY_VALUABLES_CUSTOMSTYLE
+}
+
+/*@ define:input:filtering
+type: boolean
+label: Show noted Red spiders' eggs as Trophy
+group: Trophy Items
+*/
+#define VAR_SHOW_NOTED_RED_SPIDERS_EGGS true
+
+rule (name:"Red spiders' eggs" && noted:true && VAR_SHOW_NOTED_RED_SPIDERS_EGGS) {
+    textColor = "#fafaf7";
+    backgroundColor = "#0033c7cc";
+    borderColor = "#0033c7cc";
+    textAccentColor = "#ff00ea";
+    lootbeamColor = "#030002";
+    menuTextColor = "#ffff9900";
+    fontType = 3;
+    showLootbeam = true;
+    showValue = false;
+    showDespawn = false;
+    notify = false;
+    icon = Item(223);
+    hidden = false;
+}
+
 
 /*@ define:module:sorting
 ---
